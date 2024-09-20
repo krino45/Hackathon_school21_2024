@@ -7,7 +7,7 @@
     const fetchData = async () => {
     try {
             console.log(import.meta.env.VITE_NODE_API_HOST)
-            const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/data');
+            const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/message');
             if (response.status === 200) {
                 message.value = response.data.message;
                 console.log(response);
