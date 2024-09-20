@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MyApi.Models;
+using System.Reflection;
 
 namespace MyApi
 {
@@ -16,7 +17,9 @@ namespace MyApi
                 Environment.Exit(0);
             }
             var client = new MongoClient(connectionString);
-            return client.GetDatabase("eventsgroup").GetCollection<PreferenceTag>("tags").Find(FilterDefinition<PreferenceTag>.Empty).ToListAsync().ToJson();
+            List<PreferenceTag> collection = await client.GetDatabase("eventsgroup").GetCollection<PreferenceTag>("tags").Find(FilterDefinition<PreferenceTag>.Empty).ToListAsync();
+            string collection_json = collection.ToJson();
+            return collection_json;
 
         }
     }
