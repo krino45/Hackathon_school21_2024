@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using System.Text.Json;
 
 namespace MyApi
 {
@@ -8,9 +9,13 @@ namespace MyApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var app = builder.Build();
+            builder.Services.AddCors();
 
-            app.MapGet("/message", () => "Hello from C#!");
+            var app = builder.Build();
+            app.UseCors(policy => policy
+            .AllowAnyOrigin());
+
+            app.MapGet("/message", () => JsonDocument.Parse("{\"message\": \"Hello from C#!\"}"));
 
             app.Run("http://localhost:5258");
         }
