@@ -1,9 +1,13 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
 import TestComp from './components/TestCompon.vue'
+import Header from './components/Header.vue'
 </script>
 
 <template>
+
+  <Header/>
+
   <div>
     <a href="https://vitejs.dev" target="_blank">
       <img src="/vite.svg" class="logo" alt="Vite logo" />
@@ -12,10 +16,8 @@ import TestComp from './components/TestCompon.vue'
       <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
     </a>
   </div>
-  <HelloWorld msg="Vite + Vue" />
-
+  
   <TestComp/>
-
 </template>
 
 <style scoped>
