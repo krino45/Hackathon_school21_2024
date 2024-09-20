@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Builder;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace MyApi
 {
@@ -14,9 +14,8 @@ namespace MyApi
             var app = builder.Build();
             app.UseCors(policy => policy
             .AllowAnyOrigin());
-
-            app.MapGet("/message", () => JsonDocument.Parse("{\"message\": \"Hello from C#!\"}"));
-
+            
+            app.MapGet("/api/preferences", async () => await TagService.GetTagCollectionJSON()); 
             app.Run("http://localhost:5258");
         }
     }
