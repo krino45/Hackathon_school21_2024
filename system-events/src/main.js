@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { router } from './router/router'
 import './style.css'
 import App from './App.vue'
 
@@ -14,6 +15,7 @@ library.add(...Object.values(solid).filter(icon => icon.iconName));
 
 const app = createApp(App);
 
+app.use(router);
 app.component('font-awesome-icon', FontAwesomeIcon);
 
 app.mount('#app');
