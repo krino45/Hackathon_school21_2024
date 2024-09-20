@@ -1,40 +1,40 @@
 <script setup>
-    //let activenk = "";
 </script>
 
 <template>
-
     <header>
         <div class="logo">
+            <a href="../views/HomeView.vue" style="color: inherit; ">
             <img src="../assets/logo.svg" alt="logo"/>
+            </a>
         </div>
         <div class="credits">
             <div class="credit">
-                <a href="Адрес ссылки" style="color: inherit;">
-                    <font-awesome-icon :icon="['fab', 'vk']" size="2x" />
-                </a> 
-            </div>
-            <div class="credit">
-                <a href="Адрес ссылки" style="color: inherit; ">
+                <a href="https://t.me/krona_businessclub" style="color: inherit; ">
                     <font-awesome-icon :icon="['fab', 'telegram']" size="2x" />
                 </a>
             </div>
             <div class="credit">
-                <a href="Адрес ссылки" style="color: inherit; ">
+                <a href="https://vk.com/krona_club_nsk" style="color: inherit;">
+                    <font-awesome-icon :icon="['fab', 'vk']" size="2x" />
+                </a> 
+            </div>
+            <div class="credit">
+                <a href="https://wa.me/79139409888" style="color: inherit; ">
                     <font-awesome-icon :icon="['fab', 'whatsapp']" size="2x" />
                 </a>
             </div>
             <div class="credit">
-                <a href="Адрес ссылки" style="color: inherit; ">
+                <a href="https://go.2gis.com/4x5en" style="color: inherit; ">
                     <font-awesome-icon :icon="['fas', 'location-dot']" size="2x" />
                 </a>
             </div>
         </div>
         <div class="menu">
-            <button style="color: #a064b9;" onclick="showMenu()">Menu</button>
-            <div class="content">
-                <button class="menuButton">settings</button>
-                <button class="menuButton">exit</button>
+            <button style="color: #a064b9;" >Menu</button>
+            <div class="active" >
+                <form class="menuButton" action="../views/LoginView.vue"><button class="menuButton">log in</button></form>
+                <form class="menuButton" action=""><button class="menuButton">exit</button></form>
             </div>
         </div>
     </header>
@@ -68,21 +68,25 @@
         width:fit-content;
         position: relative;
         top: 20%;
+        right: 3%;
         display: inline;
-    }
+    }  
 
-    .content
+    .menu:hover .active {display: block;}
+
+    .active
     {
-        background-color: rgba(0, 0, 0, 0.25);
+        background-color: rgba(255, 255, 255, 0.25);
         width: 100%;
         position: absolute;
-        display: flex;
+        display: none;
         flex-direction: column;
     }
+
     .menuButton
     {
         background-color: transparent;
-        color:aqua;
+        color: #a064b9;
         border: none;
     }
 
@@ -91,11 +95,11 @@
         position: absolute;
         width: 10%;
         top:30%;
-        left: 17%;
+        left: 20%;
         display: inline-flex;
         flex-direction: row;
         justify-content: space-between;
         color: white;
-    }
+    }   
 
 </style>
