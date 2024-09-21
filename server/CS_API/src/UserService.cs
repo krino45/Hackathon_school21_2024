@@ -22,12 +22,13 @@ namespace MyApi
             var usersCollection = database.GetCollection<User>("Users");
 
             var update = Builders<User>.Update
-                .Set(u => u.Email, userSettings.Email)
-                .Set(u => u.Preferences, userSettings.Preferences);
+                .Set(u => u.Email, userSettings.Email);
+                //.Set(u => u.Preferences, userSettings.Preferences);
 
             ObjectId objectId = ObjectId.Parse(userSettings.Id);
 
-            var result = await usersCollection.UpdateOneAsync(u => u.Id.Equals(userSettings.Id), update);
+
+            var result = await usersCollection.UpdateOneAsync(u => u.Id.ToString().Equals(userSettings.Id), update);
 
             if (result.ModifiedCount > 0)
                 return Results.Ok("User data has been updated successfully.");

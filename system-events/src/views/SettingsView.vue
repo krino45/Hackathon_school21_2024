@@ -1,6 +1,6 @@
 <script>
 import axios from 'axios';
-import ToggleButton from './ToggleButton.vue'
+import ToggleButton from '../components/ToggleButton.vue'
 
 export default {
   name: 'SettingsView',
@@ -20,7 +20,7 @@ export default {
 
   mounted() {
     this.fetchPreferences(); // Вызов метода при загрузке страницы
-    localStorage.setItem('user', JSON.stringify({ id: "66ed6be90840463b66a487fa", email: "hello124@yandex.ru", password: "some_password" }));
+    localStorage.setItem('user', JSON.stringify({ id: "66ed6be90840463b66a487fa", email: "hello13224@yandex.ru", password: "some_password" }));
   },
 
   methods: {
@@ -36,8 +36,8 @@ export default {
         
         console.info(JSON.parse(response.data).map(item => item.Tag));
 
-        response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "api/email");
-        this.email = JSON.parse(response.data).email;
+        // response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "api/email");
+        // this.email = JSON.parse(response.data).email;
         
 
       } catch (error) {
