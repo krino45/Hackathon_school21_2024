@@ -1,6 +1,6 @@
     using System.Text.Json;
     using System.Threading.Tasks;
-using MongoDB.Driver;
+    using MongoDB.Driver;
 
     namespace MyApi
     {
@@ -13,12 +13,13 @@ using MongoDB.Driver;
                 builder.Services.AddCors();
                 builder.Services.AddSingleton<IMongoClient>(s => new MongoClient(Environment.GetEnvironmentVariable("MONGODB_URI")));
                 builder.Services.AddScoped<TagService>();
+                builder.Services.AddScoped<UserService>();
 
             var app = builder.Build();
                 app.UseCors(policy => policy
                 .AllowAnyOrigin()
-                // .AllowAnyHeader()
-                // .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowAnyMethod()
                 );
 
                 app.MapGet("/api/preferences", async (TagService tagService) =>
@@ -27,11 +28,11 @@ using MongoDB.Driver;
                     return Results.Ok(jsonResult);
                 });
 
-                app.MapGet("/api/events", async (EventService eventService) =>
-                {
-                    var jsonResult = await eventService.GetEventCollectionJSON();
-                    return Results.Ok(jsonResult);
-                });
+                    app.MapGet("/api/events", async (UserService userService) =>
+                    {
+                        var jsonResult = await userService.GetUserJSON();
+                        return Results.Ok(jsonResult);
+                    });
 
 
             app.Run("http://localhost:5258");

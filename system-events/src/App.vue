@@ -9,10 +9,10 @@ import SettingsView from './views/SettingsView.vue'
 <template>
 
   <!-- <Header/>  -->
-   <!-- <Calendar/> -->
-    <SettingsView/>
+   <Calendar/>
+    <!-- <SettingsView/> -->
   
-  <TestComp/>
+  <!-- <TestComp/> -->
 </template>
 
 <style scoped>

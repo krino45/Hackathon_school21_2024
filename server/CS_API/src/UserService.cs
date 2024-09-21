@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace MyApi
 {
-    public class EventService
+    public class UserService
     {
         private readonly IMongoClient _mongoClient;
 
-        public EventService(IMongoClient mongoClient)
+        public UserService(IMongoClient mongoClient)
         {
             _mongoClient = mongoClient;
         }
 
-        public async Task<string> GetEventCollectionJSON()
+        public async Task<string> GetUserJSON()
         {
             var database = _mongoClient.GetDatabase("eventsgroup");
-            var collection = await database.GetCollection<PreferenceTag>("Users")
-                                           .Find(FilterDefinition<PreferenceTag>.Empty)
+            var collection = await database.GetCollection<User>("Users")
+                                           .Find(FilterDefinition<User>.Empty)
                                            .ToListAsync();
 
             return JsonConvert.SerializeObject(collection);
