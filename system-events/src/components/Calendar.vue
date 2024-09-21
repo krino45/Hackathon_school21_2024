@@ -197,6 +197,7 @@ methods:{
 </script>
 
 <template>
+    
     <div class="calendar">
         <div class="date">
           <p color="#ffdfdf">Сегодня</p>
@@ -235,7 +236,7 @@ methods:{
     {
         width: 35%;
         height:fit-content;
-        min-height: 40%;
+        min-height: 200px;
         display: flex;
         flex-direction: column;
         background-color: #a940b9;

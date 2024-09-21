@@ -16,11 +16,50 @@ namespace MyApi
         {
             _user_repo = new UserRepository(mongoClient);
         }
+
+        public async Task<bool> ValidateLoginAsyncJSON(string json)
+        {
+            try
+            {
+                var jsonObj = JObject.Parse(json);
+                if (jsonObj == null)
+                    return false;
+                string? email = jsonObj["login"]?.ToString();
+                string? password = jsonObj["password"]?.ToString();
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return false;
+                }
+                if (string.IsNullOrEmpty(password))
+                {
+                    return false;
+                }
+
+                User? user = await _user_repo.GetUserByEmailAsync(email);
+
+                if (user == null)
+                {
+                    return false;
+                }
+
+                bool validation = User.ValidatePassword(password, user.PasswordHash, user.PasswordSalt);
+
+                return validation;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
         public async Task<string> RegisterUserAsyncJSON(string json)
         {
             try
             {
+                await Console.Out.WriteLineAsync(json);
                 var newUser = JsonConvert.DeserializeObject<User>(json);
+                await Console.Out.WriteLineAsync(newUser.LastName + " " + newUser.FirstName + " " + newUser.MiddleName + " " + newUser.Email);
                 if (newUser == null)
                     throw new ArgumentException("Invalid JSON input.");
                 if (newUser.Email == null)
@@ -84,6 +123,14 @@ namespace MyApi
                 var jsonObj = JObject.Parse(json);
                 System.Console.WriteLine(jsonObj["email"].ToString());
                 var email = jsonObj["email"]?.ToString();
+                if (email == null)
+                {
+                    email = jsonObj["login"]?.ToString();
+                    if (email == null)
+                    {
+                        return JsonConvert.SerializeObject(new { Success = false, Message = "Email or login is required." });
+                    }
+                }
 
                 if (string.IsNullOrEmpty(email))
                 {
@@ -109,6 +156,48 @@ System.Console.WriteLine("3");
             catch (Exception ex)
             {
                 return JsonConvert.SerializeObject(new { Success = false, Message = "An error occurred.", Error = ex.Message });
+            }
+        }
+
+        public async Task<string?> GetEmailAsyncJSON(string json)
+        {
+            try
+            {
+                //System.Console.WriteLine("T1");
+                var jsonObj = JObject.Parse(json);
+                //System.Console.WriteLine("T2");
+                var email = jsonObj["login"].ToString();
+                //System.Console.WriteLine("T3");
+                if (email ==  null)
+                {
+                    email = jsonObj["email"].ToString();
+                    if (email == null)
+                    {
+                        return JsonConvert.SerializeObject(new { Success = false, Message = "Email or login is required." });
+                    }
+                }
+                return email;
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return null;
+            }
+        }
+
+        public string GetUserIDAsyncJSON(string json)
+        {
+            try
+            {
+                var jsonObj = JObject.Parse(json);
+                //System.Console.WriteLine("json for id: " + jsonObj);
+                System.Console.WriteLine("Id: " + jsonObj["User"]?["Id"]?.ToString());
+                return jsonObj["User"]?["Id"]?.ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
             }
         }
 
