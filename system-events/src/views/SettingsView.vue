@@ -1,119 +1,111 @@
-<script>
+<script setup>
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import ToggleButton from '../components/ToggleButton.vue'
+import ToggleButton from '../components/ToggleButton.vue';
+import HeaderCustom from '@src/components/Header.vue';
 
-export default {
-  name: 'SettingsView',
-  components: { ToggleButton },
-  data() {
-    return {
-      preferences: [],
-      selectedPreferences: [],
-      email: '',
-      oldPassword: '',
-      newPassword: '',
-      editEmail: false,
-      editPassword: false,
-      oldPasswordVisible: false,
-      newPasswordVisible: false,
-    };
-  },
+// Работа с данными через `ref`, более удобный подход для Composition API
+const preferences = ref([]);
+const selectedPreferences = ref([]);
+const email = ref('');
+const oldPassword = ref('');
+const newPassword = ref('');
+const editEmail = ref(false);
+const editPassword = ref(false);
+const oldPasswordVisible = ref(false);
+const newPasswordVisible = ref(false);
 
-  mounted() {
-    this.fetchPreferences(); // Вызов метода при загрузке страницы
-    localStorage.setItem('user', JSON.stringify({ id: "66eeaf39622b7f199d5def83" }));
-  },
+// Загрузка данных при монтировании компонента
+onMounted(() => {
+  fetchPreferences();
+  localStorage.setItem('user', JSON.stringify({ id: "66eeaf39622b7f199d5def83" }));
+});
 
-  methods: {
-    async fetchPreferences() {
-      try {
-        const userData = localStorage.getItem('user');
-        const user = JSON.parse(userData);
-        this.email = user.email;
-        let id = user.id;
+// Функция для получения предпочтений
+const fetchPreferences = async () => {
+  try {
+    const userData = localStorage.getItem('user');
+    const user = JSON.parse(userData);
+    let id = user.id;
+    let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences');
+    preferences.value = JSON.parse(response.data).map(item => item.Tag);
 
-        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences'); // URL нашего бэкенда
-        this.preferences = JSON.parse(response.data).map(item => item.Tag);
-        
-        console.info(JSON.parse(response.data).map(item => item.Tag));
+    response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user", {
+      params: { userJsonId: JSON.stringify({ userId: id }) },
+    });
+    let dbUser = JSON.parse(response.data).User;
+    email.value = dbUser.Email;
+    selectedPreferences.value = dbUser.Preferences;
 
-        response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user", {
-          params: { userJsonId: JSON.stringify({ userId: id }) },
-        });
-        let dbUser = JSON.parse(response.data).User;
-        this.email = dbUser.Email;
-        this.selectedPreferences = dbUser.Preferences;
+  } catch (error) {
+    console.error('Error fetching preferences:', error);
+  }
+};
 
-      } catch (error) {
-        console.error('Error fetching preferences:', error);
-      }
-    },
-
-    togglePreference(preference) {
-      const index = this.selectedPreferences.indexOf(preference);
-      if (index === -1) {
-        this.selectedPreferences.push(preference);
-      } else {  
-        this.selectedPreferences.splice(index, 1);
-      }
-      console.log(this.selectedPreferences);
-    },
-
-    async saveChanges() {
-      try {
-        const userData = localStorage.getItem('user');
-        const user = JSON.parse(userData);
-        let response = await axios.post(
-            import.meta.env.VITE_NODE_API_HOST + '/api/post_user_email', 
-            {
-                userId: user.id,
-                newEmail: this.email,
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-        response = await axios.post(
-            import.meta.env.VITE_NODE_API_HOST + '/api/post_user_password', 
-            {
-                userId: user.id,
-                currentPassword: this.oldPassword,
-                newPassword: this.newPassword,
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-        response = await axios.post(
-          import.meta.env.VITE_NODE_API_HOST + '/api/post_user_preferences', 
-          {
-              userId: user.id,
-              preferences: this.selectedPreferences,
+// Функция для сохранения изменений
+const saveChanges = async () => {
+  try {
+    const userData = localStorage.getItem('user');
+    const user = JSON.parse(userData);
+    let response = await axios.post(
+      import.meta.env.VITE_NODE_API_HOST + '/api/post_user_email', 
+      {
+          userId: user.id,
+          newEmail: this.email,
+      },
+      {
+          headers: {
+              'Content-Type': 'application/json',
           },
-          {
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-          });
-      } catch (error) {
-        console.error('There was an error!', error);
-      }
-    }
-    
+      });
+
+  response = await axios.post(
+      import.meta.env.VITE_NODE_API_HOST + '/api/post_user_password', 
+      {
+          userId: user.id,
+          currentPassword: this.oldPassword,
+          newPassword: this.newPassword,
+      },
+      {
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+  response = await axios.post(
+    import.meta.env.VITE_NODE_API_HOST + '/api/post_user_preferences', 
+    {
+        userId: user.id,
+        preferences: this.selectedPreferences,
+    },
+    {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+  } catch (error) {
+    console.error('There was an error!', error);
+  }
+};
+
+// Функция переключения предпочтений
+const togglePreference = (preference) => {
+  const index = selectedPreferences.value.indexOf(preference);
+  if (index === -1) {
+    selectedPreferences.value.push(preference);
+  } else {
+    selectedPreferences.value.splice(index, 1);
   }
 };
 </script>
 
 <template>
+  <HeaderCustom />
+
   <div class="container">
     <div class="settings-container">
       <h1>Настройки профиля</h1>
 
-      <!-- Блок изменения почты -->
       <section class="settings-section">
         <div class="section-header">
           <h2>Почта</h2>
@@ -131,7 +123,6 @@ export default {
         </div>
       </section>
 
-      <!-- Блок изменения пароля -->
       <section class="settings-section">
         <div class="section-header">
           <h2>Пароль</h2>
@@ -173,21 +164,19 @@ export default {
         </div>
       </section>
 
-      <!-- Блок предпочтений -->
       <section class="settings-section">
         <h2>Предпочтения</h2>
-          <div class="preferences">
-            <toggleButton 
-              v-for="(preference, index) in preferences" 
-              :key="index" 
-              :label="preference"
-              @toggle="togglePreference(preference)"
-              :active="selectedPreferences.includes(preference)"
-            />
-          </div>
+        <div class="preferences">
+          <toggleButton 
+            v-for="(preference, index) in preferences" 
+            :key="index" 
+            :label="preference"
+            @toggle="togglePreference(preference)"
+            :active="selectedPreferences.includes(preference)"
+          />
+        </div>
       </section>
 
-      <!-- Кнопка сохранения изменений -->
       <button @click="saveChanges()" class="save-button">Сохранить изменения</button>
     </div>
   </div>

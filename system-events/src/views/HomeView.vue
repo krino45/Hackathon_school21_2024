@@ -37,7 +37,7 @@
 
         
         <div class="logout-next">
-            <Button label="Приступить ->" class="btn-start" />
+            <Button label="Приступить ->" link="/login" class="btn-start" />
         </div>
     </div>
 </template>
@@ -50,6 +50,7 @@
         flex-direction: column;
 
         height: 100vh;
+        margin-top: 10px;
         padding: 20px;
         background: url('@assets/bg-main.svg') no-repeat;
         background-size: cover;
