@@ -49,6 +49,10 @@
                         <input type="text" required>
                     </div>
                     <div class="field-form">
+                        <label for="">Отчество</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="field-form">
                         <label for="">Почта</label>
                         <input type="email" required>
                     </div>
@@ -128,7 +132,7 @@
 
     .reg-block {
         width: 50vh;
-        height: 40vh;
+        height: 50vh;
 
         display: flex;
         flex-direction: column;
