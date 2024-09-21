@@ -20,6 +20,11 @@ export const routes = [
         component: () => import('@src/views/EventsView.vue')
     }, 
     {
+        name: 'calendar',
+        path: '/calendar',
+        component: () => import('@src/views/Calendar.vue')
+    }, 
+    {
         name: '',
         path: '/exit',
         component: () => import('@src/views/HomeView.vue')

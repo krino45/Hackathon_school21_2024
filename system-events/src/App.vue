@@ -5,8 +5,7 @@ import Calendar from './views/Calendar.vue'
 </script>
 
 <template>
-    <!-- <RouterView/> не трогайте эту строчку!!! -->
-    <Calendar/>
+    <RouterView/> не трогайте эту строчку!!!
 </template>
 
 <style scoped>

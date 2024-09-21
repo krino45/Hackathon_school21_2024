@@ -261,6 +261,7 @@
         margin-top: 12px;
         padding: 10px 18px;
         background-color: #15263f;
+        color: white;
     }
 
 </style>
