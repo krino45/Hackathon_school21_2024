@@ -19,7 +19,7 @@ namespace MyApi
         {
             _event_repo = new EventRepository(mongoClient);
         }
-        public async Task AddEventAsyncJSON(string json)
+        public async Task<string> AddEventAsyncJSON(string json)
         {
             try
             {
@@ -27,25 +27,26 @@ namespace MyApi
 
                 if (!jsonObj.ContainsKey("eventType"))
                 {
-                    throw new ArgumentException("eventType is required in the JSON.");
+                    return JsonConvert.SerializeObject(new { Success = false, Message = "eventType is required in the JSON." });
                 }
-                string eventType = jsonObj["eventType"]?.ToString();
+
+                string eventType = jsonObj["eventType"]!.ToString();
                 BaseEvent newEvent;
                 switch (eventType)
                 {
-                    case "PrivateEvent":
+                    case "t1":
                         newEvent = JsonConvert.DeserializeObject<PrivateEvent>(json);
                         break;
 
-                    case "RoundtableEvent":
+                    case "t2":
                         newEvent = JsonConvert.DeserializeObject<RoundtableEvent>(json);
                         break;
 
-                    case "IndustryEvent":
+                    case "t3":
                         newEvent = JsonConvert.DeserializeObject<IndustryEvent>(json);
                         break;
 
-                    case "PublicEvent":
+                    case "t4":
                         newEvent = JsonConvert.DeserializeObject<PublicEvent>(json);
                         break;
 
@@ -53,14 +54,15 @@ namespace MyApi
                         throw new ArgumentException("Invalid eventType specified.");
                 }
                 await _event_repo.AddEventAsync(newEvent);
+                return JsonConvert.SerializeObject(new { Success = true, Message = "Event added." });
             }
             catch (JsonException ex)
             {
-                throw new ArgumentException("Invalid JSON format.", ex);
+                return JsonConvert.SerializeObject(new { Success = false, Message = "Invalid JSON format: " + ex.Message });
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred while adding the event.", ex);
+                return JsonConvert.SerializeObject(new { Success = false, Message = "An error occurred while adding the event." + ex.Message });
             }
         }
 
@@ -82,14 +84,14 @@ namespace MyApi
                     return JsonConvert.SerializeObject(new { Success = false, Message = "Event ID is required." });
                 }
 
-                var user = await _event_repo.GetEventByIdAsync(new ObjectId(id));
+                var _event = await _event_repo.GetEventByIdAsync(new ObjectId(id));
 
-                if (user == null)
+                if (_event == null)
                 {
                     return JsonConvert.SerializeObject(new { Success = false, Message = "Event not found." });
                 }
 
-                return JsonConvert.SerializeObject(new { Success = true, Message = "Found Event!" });
+                return JsonConvert.SerializeObject(new { Success = true, Message = _event });
             }
             catch (JsonException ex)
             {
