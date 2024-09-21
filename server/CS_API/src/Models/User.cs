@@ -1,17 +1,22 @@
-﻿using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace MyApi.Models
 {
     public class User
     {
+        private const int SaltSize = 16;       // 128-bit salt
+        private const int KeySize = 32;        // 256-bit hash
+        private const int Iterations = 10000;  // PBKDF2 iterations
+
         [BsonId]
-        public ObjectId Id { get; set; } 
+        public ObjectId Id { get; set; }
 
         [BsonElement("last_name")]
-        public string? LastName { get; set; }    
+        public string? LastName { get; set; }
 
         [BsonElement("first_name")]
         public string? FirstName { get; set; }
@@ -22,8 +27,11 @@ namespace MyApi.Models
         [BsonElement("email")]
         public string? Email { get; set; }
 
-        [BsonElement("password")]
-        public string? Password { get; set; }
+        [BsonElement("password_hash")]
+        public string? PasswordHash { get; set; }
+
+        [BsonElement("password_salt")]
+        public string? PasswordSalt { get; set; }
 
         [BsonElement("role")]
         public string? Role { get; set; }
@@ -39,22 +47,50 @@ namespace MyApi.Models
 
         [BsonElement("events")]
         public List<BaseEvent>? Events { get; set; }
-        public User()
-        { }
+        public User() { }
+
         public User(string lastName, string firstName, string middleName, string email, string password,
                     string role, List<PreferenceTag>? preferences, string profession,
-                    int roundtableId, List<BaseEvent>? events)
+                    int? roundtableId, List<BaseEvent>? events)
         {
             LastName = lastName;
             FirstName = firstName;
             MiddleName = middleName;
             Email = email;
-            Password = password;
             Role = role;
             Preferences = preferences;
             Profession = profession;
             RoundtableId = roundtableId;
             Events = events;
+
+            SetPassword(password);
+        }
+
+        public void SetPassword(string password)
+        {
+            byte[] saltBytes = new byte[SaltSize];
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(saltBytes);
+                PasswordSalt = Convert.ToBase64String(saltBytes);
+            }
+
+            using (var deriveBytes = new Rfc2898DeriveBytes(password, Convert.FromBase64String(PasswordSalt), Iterations))
+            {
+                byte[] hashBytes = deriveBytes.GetBytes(KeySize);
+                PasswordHash = Convert.ToBase64String(hashBytes);
+            }
+        }
+
+        public static bool ValidatePassword(string enteredPassword, string storedPasswordHash, string storedSalt)
+        {
+            using (var deriveBytes = new Rfc2898DeriveBytes(enteredPassword, Convert.FromBase64String(storedSalt), Iterations))
+            {
+                byte[] enteredHashBytes = deriveBytes.GetBytes(KeySize);
+                string enteredPasswordHash = Convert.ToBase64String(enteredHashBytes);
+
+                return storedPasswordHash == enteredPasswordHash;
+            }
         }
     }
 }
