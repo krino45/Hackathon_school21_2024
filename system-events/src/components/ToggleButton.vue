@@ -43,7 +43,7 @@ button {
 }
 
 .preference:hover {
-  background-color: #4c73af;
+  background-color: #2e4c78;
   color:white;
 }
 </style>

@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using MongoDB.Bson;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using MyApi.Services;
 
 namespace MyApi
 {
@@ -22,6 +23,7 @@ namespace MyApi
             builder.Services.AddScoped<TagService>();
             builder.Services.AddScoped<EventService>();
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<VenueService>();
 
             var app = builder.Build();
             app.UseCors(policy => policy
@@ -44,6 +46,7 @@ namespace MyApi
             app.MapGet("/api/get_all_events", async (EventService eventService) =>
             {
                 var jsonResult = await eventService.GetAllEventsAsyncJSON();
+                Console.WriteLine(jsonResult);
                 return Results.Ok(jsonResult);
             });
 
