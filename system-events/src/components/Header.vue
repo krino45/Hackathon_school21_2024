@@ -27,7 +27,9 @@
 <template>
     <header>
         <div class="logo">
-            <img src="@assets/logo.svg" alt="logo">
+            <a href="/events">
+                <img src="@assets/logo.svg" alt="logo">
+            </a>
         </div>
 
         <div class="panel-nav">

@@ -70,9 +70,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-
-        font-family: "Aboreto", system-ui;
-        font-style: normal;
         color: #fff;
     }
 
