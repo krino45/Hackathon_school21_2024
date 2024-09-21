@@ -44,7 +44,7 @@ const handleClickExit = () => {
     localStorage.removeItem('user');
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
     const data = {
         eventType: eventType.value,
         eventName: eventName.value,
