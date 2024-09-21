@@ -24,6 +24,12 @@ using MongoDB.Driver;
                     return Results.Ok(jsonResult);
                 });
 
+                app.MapGet("/api/events", async (EventService eventService) =>
+                {
+                    var jsonResult = await tagService.GetEventCollectionJSON();
+                    return Results.Ok(jsonResult);
+                });
+
 
             app.Run("http://localhost:5258");
             }
