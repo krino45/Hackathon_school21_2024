@@ -25,7 +25,7 @@
                 <h1>Вход</h1>
                 <form action="" class="fm-block">
                     <div class="field-form">
-                        <label for="">Логин</label>
+                        <label for="">Почта</label>
                         <input type="text">
                     </div>
 
