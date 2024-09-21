@@ -68,15 +68,15 @@ namespace MyApi.Repositories
             return await _eventListCollection.Find(filter).ToListAsync();
         }
 
-        public async Task<List<BaseEvent>?> GetEventsByVenueAsync(string venueName, string address, string city)
-        {
-            var filter = Builders<BaseEvent>.Filter.And(
-                Builders<BaseEvent>.Filter.Eq(e => e.Venue.Name, venueName),
-                Builders<BaseEvent>.Filter.Eq(e => e.Venue.Address, address),
-                Builders<BaseEvent>.Filter.Eq(e => e.Venue.City, city)
-                );
-            return await _eventListCollection.Find(filter).ToListAsync();
-        }
+        //public async Task<List<BaseEvent>?> GetEventsByVenueAsync(string venueName, string address, string city)
+        //{
+        //    var filter = Builders<BaseEvent>.Filter.And(
+        //        Builders<BaseEvent>.Filter.Eq(e => e.Venue.Name, venueName),
+        //        Builders<BaseEvent>.Filter.Eq(e => e.Venue.Address, address),
+        //        Builders<BaseEvent>.Filter.Eq(e => e.Venue.City, city)
+        //        );
+        //    return await _eventListCollection.Find(filter).ToListAsync();
+        //}
         public async Task<List<BaseEvent>?> GetEventsByVenueAsync(Venue venue)
         {
             var venueEvents = venue.EventIDs;

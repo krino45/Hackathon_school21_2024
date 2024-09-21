@@ -9,7 +9,8 @@ namespace MyApi.Models
     }
     public class RoundtableEvent : BaseEvent
     {
-        public int? roundtableID { get; set; }
+        [BsonElement("round_table_id")]
+        public int? RoundTableId { get; set; }
     }
     public class IndustryEvent : BaseEvent
     {

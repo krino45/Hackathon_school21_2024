@@ -70,11 +70,38 @@ namespace MyApi
             return JsonConvert.SerializeObject(await _event_repo.GetAllEventsAsync());
         }
 
-        public async Task<string?> GetEventByIdAsyncJSON(string id)
+        public async Task<string?> GetEventByIdAsyncJSON(string json)
         {
-            return JsonConvert.SerializeObject(await _event_repo.GetEventByIdAsync(new ObjectId(id)));
+            try
+            {
+                var jsonObj = JObject.Parse(json);
+                var id = jsonObj["id"]?.ToString();
+
+                if (string.IsNullOrEmpty(id))
+                {
+                    return JsonConvert.SerializeObject(new { Success = false, Message = "Event ID is required." });
+                }
+
+                var user = await _event_repo.GetEventByIdAsync(new ObjectId(id));
+
+                if (user == null)
+                {
+                    return JsonConvert.SerializeObject(new { Success = false, Message = "Event not found." });
+                }
+
+                return JsonConvert.SerializeObject(new { Success = true, Message = "Found Event!" });
+            }
+            catch (JsonException ex)
+            {
+                return JsonConvert.SerializeObject(new { Success = false, Message = "Invalid JSON format.", Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { Success = false, Message = "An error occurred.", Error = ex.Message });
+            }
         }
 
+        /*
         public async Task<string?> GetEventsByTimeRangeAsyncJSON(string start, string end)
         {
             return JsonConvert.SerializeObject(await _event_repo.GetEventsByTimeRangeAsync(DateTime.Parse(start), DateTime.Parse(end)));
@@ -84,10 +111,10 @@ namespace MyApi
         {
             return JsonConvert.SerializeObject(await _event_repo.GetEventsByVenueAsync(venue));
         }
-        public async Task<string?> GetEventsByVenueAsyncJSON(string venueName, string address, string city)
-        {
-            return JsonConvert.SerializeObject(await _event_repo.GetEventsByVenueAsync(venueName, address, city));
-        }
+        //public async Task<string?> GetEventsByVenueAsyncJSON(string venueName, string address, string city)
+        //{
+        //    return JsonConvert.SerializeObject(await _event_repo.GetEventsByVenueAsync(venueName, address, city));
+        //}
         public async Task<string?> GetEventsByNameAsyncJSON(string eventName)
         {
             return JsonConvert.SerializeObject(await _event_repo.GetEventsByNameAsync(eventName));
@@ -95,6 +122,6 @@ namespace MyApi
         public async Task<string?> SearchEventsByNameAsyncJSON(string partialName)
         {
             return JsonConvert.SerializeObject(await _event_repo.SearchEventsByNameAsync(partialName));
-        }
+        }*/
     }
 }
