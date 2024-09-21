@@ -37,7 +37,7 @@ namespace MyApi.Models
         public string? Role { get; set; }
 
         [BsonElement("preferences")]
-        public List<PreferenceTag>? Preferences { get; set; }
+        public List<string>? Preferences { get; set; }
 
         [BsonElement("profession")]
         public string? Profession { get; set; }
@@ -46,12 +46,12 @@ namespace MyApi.Models
         public int? RoundtableId { get; set; }
 
         [BsonElement("events")]
-        public List<BaseEvent>? Events { get; set; }
+        public List<ObjectId>? Events { get; set; }
         public User() { }
 
         public User(string lastName, string firstName, string middleName, string email, string password,
-                    string role, List<PreferenceTag>? preferences, string profession,
-                    int? roundtableId, List<BaseEvent>? events)
+                    string role, List<string>? preferences, string profession,
+                    int? roundtableId, List<ObjectId>? events)
         {
             LastName = lastName;
             FirstName = firstName;

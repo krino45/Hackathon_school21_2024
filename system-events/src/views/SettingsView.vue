@@ -10,17 +10,18 @@ export default {
       preferences: [],
       selectedPreferences: [],
       email: '',
-      oldEmail: '',
-      password: '',
+      oldPassword: '',
+      newPassword: '',
       editEmail: false,
       editPassword: false,
-      newsletter: false,
+      oldPasswordVisible: false,
+      newPasswordVisible: false,
     };
   },
 
   mounted() {
     this.fetchPreferences(); // Вызов метода при загрузке страницы
-    localStorage.setItem('user', JSON.stringify({ id: "66ed6be90840463b66a487fa", email: "hello13224@yandex.ru", password: "some_password" }));
+    localStorage.setItem('user', JSON.stringify({ id: "66eeaf39622b7f199d5def83" }));
   },
 
   methods: {
@@ -29,16 +30,19 @@ export default {
         const userData = localStorage.getItem('user');
         const user = JSON.parse(userData);
         this.email = user.email;
-        this.password = user.password;
+        let id = user.id;
 
-        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/preferences'); // URL нашего бэкенда
+        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences'); // URL нашего бэкенда
         this.preferences = JSON.parse(response.data).map(item => item.Tag);
         
         console.info(JSON.parse(response.data).map(item => item.Tag));
 
-        // response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "api/email");
-        // this.email = JSON.parse(response.data).email;
-        
+        response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user", {
+          params: { userJsonId: JSON.stringify({ userId: id }) },
+        });
+        let dbUser = JSON.parse(response.data).User;
+        this.email = dbUser.Email;
+        this.selectedPreferences = dbUser.Preferences;
 
       } catch (error) {
         console.error('Error fetching preferences:', error);
@@ -59,13 +63,42 @@ export default {
       try {
         const userData = localStorage.getItem('user');
         const user = JSON.parse(userData);
-        const response = await axios.post(import.meta.env.VITE_NODE_API_HOST + '/api/settings', {
-          id: user.id,
-          email: this.email,
-          password: this.password,
-          preferences: this.selectedPreferences
-        });
-        console.log('Response:', response.data);
+        let response = await axios.post(
+            import.meta.env.VITE_NODE_API_HOST + '/api/post_user_email', 
+            {
+                userId: user.id,
+                newEmail: this.email,
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+        response = await axios.post(
+            import.meta.env.VITE_NODE_API_HOST + '/api/post_user_password', 
+            {
+                userId: user.id,
+                currentPassword: this.oldPassword,
+                newPassword: this.newPassword,
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+        response = await axios.post(
+          import.meta.env.VITE_NODE_API_HOST + '/api/post_user_preferences', 
+          {
+              userId: user.id,
+              preferences: this.selectedPreferences,
+          },
+          {
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+          });
       } catch (error) {
         console.error('There was an error!', error);
       }
@@ -107,13 +140,36 @@ export default {
           </button>
         </div>
         <div class="input-group">
-          <input 
-            type="password" 
-            v-model="password" 
-            placeholder="Новый пароль" 
-            :disabled="!editPassword" 
-            class="settings-input" 
+          <input
+            :type="oldPasswordVisible ? 'text' : 'password'"
+            v-model="oldPassword"
+            placeholder="Текущий пароль"
+            :disabled="!editPassword"
+            class="settings-input"
           />
+          <button @click="oldPasswordVisible = !oldPasswordVisible" class="eye-button" :disabled="!editPassword"
+          :style="{ cursor: editPassword ? 'pointer' : 'default' }">
+            <font-awesome-icon 
+              :icon="oldPasswordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'" 
+              :style="{ color: editPassword ? '#6a0dad' : 'grey' }"
+            />
+          </button>
+        </div>
+
+        <div class="input-group">
+          <input
+            :type="newPasswordVisible ? 'text' : 'password'"
+            v-model="newPassword"
+            placeholder="Новый пароль"
+            :disabled="!editPassword" 
+            class="settings-input"
+          />
+          <button @click="newPasswordVisible = !newPasswordVisible" class="eye-button" :disabled="!editPassword"
+          :style="{ cursor: editPassword ? 'pointer' : 'default' }">
+            <font-awesome-icon :icon="newPasswordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'" 
+            :style="{ color: editPassword ? '#6a0dad' : 'grey' }"
+            />
+          </button>
         </div>
       </section>
 
@@ -188,7 +244,9 @@ h2 {
 
 /* Инпуты */
 .input-group {
+  position: relative;
   margin-top: 10px;
+  margin-bottom: 15px;
   width: 95%;
 }
 
@@ -200,6 +258,8 @@ h2 {
   border: 1px solid #ccc;
   background-color: #f9f9f9;
   color: #333;
+  width: calc(100% - 40px); /* Уменьшаем ширину, чтобы оставить место для кнопки */
+  padding-right: 40px; /* Добавляем отступ справа для кнопки */
 }
 
 .settings-input:disabled {
@@ -369,5 +429,19 @@ input[type="checkbox"] {
   flex-wrap: wrap;
   justify-content: center;
 }
-</style>
 
+.eye-button {
+  position: absolute;
+  left: 95%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.eye-button i {
+  font-size: 16px; /* Размер иконки */
+}
+
+</style>

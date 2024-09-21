@@ -155,6 +155,9 @@ namespace MyApi
                 string userId = jsonObj.userId;
                 string newEmail = jsonObj.newEmail;
 
+                if (String.IsNullOrEmpty(newEmail))
+                    return JsonConvert.SerializeObject(new { Success = false, Message = "Email can not be empty." });
+
                 var existingUser = await _user_repo.GetUserByEmailAsync(newEmail);
                 if (existingUser != null)
                     return JsonConvert.SerializeObject(new { Success = false, Message = "Email is already in use." });
@@ -176,12 +179,6 @@ namespace MyApi
             }
         }
 
-        //{
-        //  "userId": "60f7f09f5cafe305ac34b589",
-        //  "currentPassword": "Secret123",
-        //  "newPassword": "NewSecret456"
-        //}
-
     public async Task<string> ChangePasswordAsyncJSON(string json)
         {
             try
@@ -193,6 +190,9 @@ namespace MyApi
                 string userId = jsonObj.userId;
                 string currentPassword = jsonObj.currentPassword;
                 string newPassword = jsonObj.newPassword;
+
+                if (String.IsNullOrEmpty(currentPassword) && String.IsNullOrEmpty(newPassword))
+                    return JsonConvert.SerializeObject(new { Success = true, Message = "The password does not need to be changed" });
 
                 var objectId = new ObjectId(userId);
                 var user = await _user_repo.GetUserByIdAsync(objectId);
@@ -240,7 +240,7 @@ namespace MyApi
                     return JsonConvert.SerializeObject(new { Success = false, Message = "User not found." });
                 }
 
-                var newPreferences = preferencesArray.ToObject<List<PreferenceTag>>();
+                var newPreferences = preferencesArray.ToObject<List<string>>();
 
                 user.Preferences = newPreferences;
 

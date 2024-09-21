@@ -46,6 +46,7 @@ namespace MyApi.Repositories
             var filter = Builders<User>.Filter.Eq(u => u.Email, email);
             return await _usersCollection.Find(filter).FirstOrDefaultAsync();
         }
+
         public async Task<bool> UpdateUserAsync(User updatedUser)
         {
             var filter = Builders<User>.Filter.Eq(u => u.Id, updatedUser.Id);
