@@ -16,11 +16,50 @@ namespace MyApi
         {
             _user_repo = new UserRepository(mongoClient);
         }
+
+        public async Task<bool> ValidateLoginAsyncJSON(string json)
+        {
+            try
+            {
+                var jsonObj = JObject.Parse(json);
+                if (jsonObj == null)
+                    return false;
+                string? email = jsonObj["login"]?.ToString();
+                string? password = jsonObj["password"]?.ToString();
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return false;
+                }
+                if (string.IsNullOrEmpty(password))
+                {
+                    return false;
+                }
+
+                User? user = await _user_repo.GetUserByEmailAsync(email);
+
+                if (user == null)
+                {
+                    return false;
+                }
+
+                bool validation = User.ValidatePassword(password, user.PasswordHash, user.PasswordSalt);
+
+                return validation;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
         public async Task<string> RegisterUserAsyncJSON(string json)
         {
             try
             {
+                await Console.Out.WriteLineAsync(json);
                 var newUser = JsonConvert.DeserializeObject<User>(json);
+                await Console.Out.WriteLineAsync(newUser.LastName + " " + newUser.FirstName + " " + newUser.MiddleName + " " + newUser.Email);
                 if (newUser == null)
                     throw new ArgumentException("Invalid JSON input.");
                 if (newUser.Email == null)
@@ -105,6 +144,36 @@ namespace MyApi
             catch (Exception ex)
             {
                 return JsonConvert.SerializeObject(new { Success = false, Message = "An error occurred.", Error = ex.Message });
+            }
+        }
+
+        public async Task<string?> GetEmailAsyncJSON(string json)
+        {
+            try
+            {
+                var jsonObj = JObject.Parse(json);
+                if (jsonObj["login"] ==  null)
+                    return jsonObj["email"]!.ToString();
+                return jsonObj["login"]!.ToString();
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<string?> GetUserIDAsyncJSON(string json)
+        {
+            try
+            {
+                var jsonObj = JObject.Parse(json);
+                return jsonObj["id"]?.ToString();
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync(ex.Message);
+                return null;
             }
         }
 

@@ -1,16 +1,86 @@
 <script setup>
-    import { ref } from 'vue';
+import { ref } from 'vue';
 
-    const isLogin = ref(true);
+const isLogin = ref(true);
+const login = ref('');
+const password = ref('');
+const FirstName = ref('');
+const LastName = ref('');
+const MiddleName = ref('');
+const email = ref('');
+const PasswordHash = ref('');
+const responseMessage = ref(''); 
 
-    const showLogin = () => {
-        isLogin.value = true;
+const showLogin = () => {
+    isLogin.value = true;
+};
+
+const showRegister = () => {
+    isLogin.value = false;
+};
+
+const handleLogin = async () => {
+    const credentials = {
+        login: login.value,
+        password: password.value
+    };
+
+    try {
+        const response = await fetch(import.meta.env.VITE_NODE_API_HOST + '/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(credentials)
+        });
+
+        if (!response.ok) {
+            throw new Error('Login failed');
+        }
+
+        const data = await response.json();
+        console.log('Login successful:', data);
+        responseMessage.value = '';
+        localStorage.setItem('user', data.message);
+
+    } catch (error) {
+        console.error('Error:', error);
+        responseMessage.value = error.message;
     }
+};
 
-    const showRegister = () => {
-        isLogin.value = false;
+const handleRegistration = async () => {
+    const registrationData = {
+        FirstName: FirstName.value,
+        LastName: LastName.value,
+        MiddleName: MiddleName.value,
+        email: email.value,
+        PasswordHash: PasswordHash.value
+    };
+
+    try {
+        const response = await fetch(import.meta.env.VITE_NODE_API_HOST + '/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(registrationData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Registration failed');
+        }
+
+        const data = await response.json();
+        console.log('Registration successful:', data);
+        responseMessage.value = '';
+        localStorage.setItem('user', data.message);
+
+    } catch (error) {
+        console.error('Error:', error);
+        responseMessage.value = error.message;
     }
-
+};
 </script>
 
 <template>
@@ -23,15 +93,20 @@
 
             <div class="login-block" v-if="isLogin">
                 <h1>Вход</h1>
-                <form action="" class="fm-block">
+                <form @submit.prevent="handleLogin" class="fm-block">
+                    <div :class="['err-msg', responseMessage ? 'visible' : '']">
+                        <p>{{ responseMessage }}</p>
+                    </div>
+
+
                     <div class="field-form">
                         <label for="">Почта</label>
-                        <input type="text">
+                        <input type="text" v-model="login" required>
                     </div>
 
                     <div class="field-form">
                         <label for="">Пароль</label>
-                        <input type="password">
+                        <input type="password" v-model="password" required>
                     </div>
                     
                     <input type="submit" id="sub-block" value="Вход">
@@ -39,14 +114,21 @@
             </div>
             <div class="reg-block" v-else>
                 <h1>Регистрация</h1>
-                <form action="" class="fm-block">
-                    <div class="field-form">
-                        <label for="">Имя</label>
-                        <input type="text" required>
+                <form @submit.prevent="handleRegistration" class="fm-block">
+                    <div :class="['err-msg', responseMessage ? 'visible' : '']">
+                        <p>{{ responseMessage }}</p>
                     </div>
                     <div class="field-form">
                         <label for="">Фамилия</label>
-                        <input type="text" required>
+                        <input type="text" v-model="LastName" required>
+                    </div>
+                    <div class="field-form">
+                        <label for="">Имя</label>
+                        <input type="text" v-model="FirstName" required>
+                    </div>
+                    <div class="field-form">
+                        <label for="">Отчество</label>
+                        <input type="text" v-model="MiddleName" required>
                     </div>
                     <div class="field-form">
                         <label for="">Отчество</label>
@@ -54,11 +136,11 @@
                     </div>
                     <div class="field-form">
                         <label for="">Почта</label>
-                        <input type="email" required>
+                        <input type="email" v-model="email" required>
                     </div>
                     <div class="field-form">
                         <label for="">Пароль</label>
-                        <input type="password" required>
+                        <input type="password" v-model="PasswordHash" required>
                     </div>
 
                     <input type="submit" id="sub-block" value="Зарегистрироваться">
@@ -74,11 +156,13 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        font-family: "Aboreto", system-ui;
+        font-style: normal;
         color: #fff;
     }
 
     .auth-block h1 {
-        padding-bottom: 30px;
+        padding-bottom: 15px;
     }
 
     .swapper {
@@ -118,7 +202,7 @@
 
     .login-block{
         width: 50vh;
-        height: 40vh;
+        height: 45vh;
 
         display: flex;
         flex-direction: column;
@@ -132,7 +216,7 @@
 
     .reg-block {
         width: 50vh;
-        height: 50vh;
+        height: 60vh;
 
         display: flex;
         flex-direction: column;
@@ -151,6 +235,25 @@
         align-items: center;
         flex-direction: column;
         gap: 20px;
+    }
+
+    .err-msg {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: red;
+        font-size: 20px;
+        font-family: 'Courier New', Courier, monospace;
+        height: 30px;
+        opacity: 0%;
+        transition: opacity 0.5s!important; 
+    }
+
+    .err-msg.visible {
+        opacity: 100%; 
     }
 
     .field-form {
