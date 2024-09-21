@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import ToggleButton from '../components/ToggleButton.vue';
+import ToggleButton from '@src/components/ToggleButton.vue';
 import HeaderCustom from '@src/components/Header.vue';
 
 // Работа с данными через `ref`, более удобный подход для Composition API
@@ -16,7 +16,7 @@ const oldPasswordVisible = ref(false);
 const newPasswordVisible = ref(false);
 
 // Загрузка данных при монтировании компонента
-onMounted(() => {
+onMounted(async () => {
   fetchPreferences();
 });
 
@@ -97,6 +97,7 @@ const togglePreference = (preference) => {
 </script>
 
 <template>
+
   <HeaderCustom />
 
   <div class="container">
@@ -198,12 +199,13 @@ const togglePreference = (preference) => {
 /* Заголовки */
 h1 {
   text-align: center;
-  color: #6a0dad;
+  color: #15263f;
+  padding-bottom: 20px;
 }
 
 h2 {
   margin-bottom: 10px;
-  color: #4b0082;
+  color: #15263f;
 }
 
 /* Блоки настроек */
@@ -225,7 +227,7 @@ h2 {
 .edit-icon {
   cursor: pointer;
   font-size: 18px;
-  color: #6a0dad;
+  color: #15263f;
 }
 
 /* Инпуты */
@@ -262,7 +264,7 @@ h2 {
 .preference-item {
   margin-bottom: 10px;
   font-size: 14px;
-  color: #4b0082;
+  color: #15263f;
 }
 
 input[type="checkbox"] {
@@ -274,7 +276,7 @@ input[type="checkbox"] {
   border-radius: 10px;
   border-width: 2px;
   border-style: solid;
-  border-color: #6a0dad;
+  border-color: #15263f;
 }
 
 /* Кнопка сохранения */
@@ -282,7 +284,7 @@ input[type="checkbox"] {
   display: block;
   width: 100%;
   padding: 12px;
-  background-color: #6a0dad;
+  background-color: #15263f;
   color: white;
   border: none;
   border-radius: 5px;
@@ -317,12 +319,12 @@ input[type="checkbox"] {
 /* Заголовки */
 h1 {
   text-align: center;
-  color: #6a0dad;
+  color: #15263f;
 }
 
 h2 {
   margin-bottom: 10px;
-  color: #4b0082;
+  color: #15263f;
 }
 
 /* Блоки настроек */
@@ -344,7 +346,7 @@ h2 {
 .edit-icon {
   cursor: pointer;
   font-size: 18px;
-  color: #6a0dad;
+  color: #15263f;
 }
 
 /* Инпуты */
@@ -377,7 +379,7 @@ h2 {
 .preference-item {
   margin-bottom: 10px;
   font-size: 14px;
-  color: #4b0082;
+  color: #15263f;
 }
 
 input[type="checkbox"] {
@@ -389,7 +391,7 @@ input[type="checkbox"] {
   border-radius: 10px;
   border-width: 2px;
   border-style: solid;
-  border-color: #6a0dad;
+  border-color: #15263f;
 }
 
 /* Кнопка сохранения */
@@ -397,7 +399,7 @@ input[type="checkbox"] {
   display: block;
   width: 100%;
   padding: 12px;
-  background-color: #6a0dad;
+  background-color: #15263f;
   color: white;
   border: none;
   border-radius: 5px;
@@ -406,7 +408,7 @@ input[type="checkbox"] {
 }
 
 .save-button:hover {
-  background-color: #5b0ba3;
+  background-color: #0a121e;
 }
 
 .preferences {

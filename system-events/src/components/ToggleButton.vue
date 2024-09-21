@@ -29,20 +29,21 @@ button {
 .preference {
   padding: 10px 20px;
   border-radius: 20px;
-  border: 2px solid #6a0dad;
+  border: 2px solid #15263f;
   background-color: white;
-  color: #6a0dad;
+  color: #15263f;
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 }
 
 .preference.active {
-  background-color: #6a0dad;
+  background-color: #15263f;
   color: white;
 }
 
 .preference:hover {
-  background-color: #e0e0e0;
+  background-color: #4c73af;
+  color:white;
 }
 </style>
