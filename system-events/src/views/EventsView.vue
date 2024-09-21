@@ -1,9 +1,12 @@
 <script setup>
-
+    import HeaderCustom from '@src/components/Header.vue'
 </script>
 
 <template>
-    <h1>Страница с событиями</h1>
+    <HeaderCustom />  
+
+    
+
 </template>
 
 <style scoped>

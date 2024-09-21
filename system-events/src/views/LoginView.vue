@@ -100,7 +100,7 @@ const handleRegistration = async () => {
 
 
                     <div class="field-form">
-                        <label for="">Логин</label>
+                        <label for="">Почта</label>
                         <input type="text" v-model="login" required>
                     </div>
 
