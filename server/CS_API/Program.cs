@@ -1,14 +1,8 @@
-<<<<<<< HEAD
-    using System.Text.Json;
-    using System.Threading.Tasks;
-    using MongoDB.Driver;
-=======
 using System.Text.Json;
 using System.Threading.Tasks;
 using MyApi.Models;
 using MongoDB.Driver;
 using System.Diagnostics.Eventing.Reader;
->>>>>>> dev
 
 namespace MyApi
 {
@@ -21,16 +15,6 @@ namespace MyApi
                 builder.Services.AddCors();
                 builder.Services.AddSingleton<IMongoClient>(s => new MongoClient(Environment.GetEnvironmentVariable("MONGODB_URI")));
                 builder.Services.AddScoped<TagService>();
-<<<<<<< HEAD
-                builder.Services.AddScoped<UserService>();
-
-            var app = builder.Build();
-                app.UseCors(policy => policy
-                .AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                );
-=======
                 builder.Services.AddScoped<EventService>();
                 builder.Services.AddScoped<UserService>();
 
@@ -45,7 +29,6 @@ namespace MyApi
                 var jsonResult = await tagService.GetTagCollectionJSON();
                 return Results.Ok(jsonResult);
             });
->>>>>>> dev
 
                 app.MapGet("/api/get_all_events", async (EventService eventService) =>
                 {

@@ -10,7 +10,13 @@ export default {
         next: '',
         date: '',
         nextDate: '',
-        eventId: 0,
+        eventsId: [
+            // '66ed195519b4026e742585b0',
+            // '66ed5fe30840463b66a487ed',
+        ],
+        eventsTime: [
+            'Событий нет'
+        ],
         weekDays: [
         ' Воскресенье',
         ' Понедельник',
@@ -57,15 +63,20 @@ methods:{
         this.next = this.getDayOfWeek(this.shift + 1)
         this.date = this.getDay(this.shift)
         this.nextDate = this.getDay(this.hift + 1)
-        try {
-        const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/events'); // URL нашего бэкенда
-        this.preferences = JSON.parse(response.data).map(item => item.EventId);
         
-        console.info(JSON.parse(response.data).map(item => item.EventId));
+        for(let i = 0; i < this.eventsId.length; i++)
+        {
+            this.eventsTime[i] = this.eventsId[i]
+        }
+    //     try {
+    //     const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/events'); // URL нашего бэкенда
+    //     this.preferences = JSON.parse(response.data).map(item => item.EventId);
+        
+    //     console.info(JSON.parse(response.data).map(item => item.EventId));
 
-      } catch (error) {
-        console.error('Error fetching preferences:', error);
-      }
+    //   } catch (error) {
+    //     console.error('Error fetching preferences:', error);
+    //   }
 
     },
 
@@ -82,11 +93,12 @@ methods:{
         <div class="date">
           <p>Сегодня</p>
           <p>{{ day }} {{ date }}</p>
+          <p v-for="(id, index) in eventsTime"> {{ id }}</p>
           
         </div>  
         <div class="date">
             <p>Завтра</p>
-            <p>{{ next }} {{ nextDate }} Ивент:{{ eventId }}</p>
+            <p>{{ next }} {{ nextDate }}</p>
 
         </div>
     </div>
