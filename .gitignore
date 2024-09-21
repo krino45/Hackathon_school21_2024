@@ -24,3 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 .vs
+
+# Test
+node-server/.env
