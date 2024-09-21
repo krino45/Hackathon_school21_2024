@@ -36,7 +36,6 @@ namespace MyApi
                 return Results.Ok(jsonResult);
             });
 
-<<<<<<< HEAD
                 app.MapGet("/api/get_all_events", async (EventService eventService) =>
                 {
                     var jsonResult = await eventService.GetAllEventsAsyncJSON();
@@ -57,9 +56,7 @@ namespace MyApi
 
 
  /*           app.MapPost("/api/settings", async (UserSettings userSettings, UserService userService) =>
-=======
             app.MapGet("/api/get_all_events", async (EventService eventService) =>
->>>>>>> 4a0afc74f6ed63de4938b5b00f19b2e98a59c745
             {
                 var jsonResult = await eventService.GetAllEventsAsyncJSON();
                 return Results.Ok(jsonResult);
