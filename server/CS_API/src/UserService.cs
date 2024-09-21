@@ -82,19 +82,23 @@ namespace MyApi
             try
             {
                 var jsonObj = JObject.Parse(json);
+                System.Console.WriteLine(jsonObj["email"].ToString());
                 var email = jsonObj["email"]?.ToString();
 
                 if (string.IsNullOrEmpty(email))
                 {
                     return JsonConvert.SerializeObject(new { Success = false, Message = "Email is required." });
                 }
-
+System.Console.WriteLine("3");
                 var user = await _user_repo.GetUserByEmailAsync(email);
+                System.Console.WriteLine("4");
 
                 if (user == null)
                 {
+                    System.Console.WriteLine("2");
                     return JsonConvert.SerializeObject(new { Success = false, Message = "User not found." });
                 }
+                System.Console.WriteLine("5");
 
                 return JsonConvert.SerializeObject(new { Success = true, User = user });
             }
@@ -240,7 +244,7 @@ namespace MyApi
                     return JsonConvert.SerializeObject(new { Success = false, Message = "User not found." });
                 }
 
-                var newPreferences = preferencesArray.ToObject<List<PreferenceTag>>();
+                var newPreferences = preferencesArray.ToObject<List<string>>();
 
                 user.Preferences = newPreferences;
 

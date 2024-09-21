@@ -43,8 +43,18 @@ namespace MyApi.Repositories
         }
         public async Task<User?> GetUserByEmailAsync(string email)
         {
-            var filter = Builders<User>.Filter.Eq(u => u.Email, email);
-            return await _usersCollection.Find(filter).FirstOrDefaultAsync();
+            try
+            {
+                var filter = Builders<User>.Filter.Eq(u => u.Email, email);
+                var cursor = _usersCollection.Find(filter);
+                var result = await cursor.FirstOrDefaultAsync<User>();
+            return result;
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+            }
+            return null;
         }
         public async Task<bool> UpdateUserAsync(User updatedUser)
         {

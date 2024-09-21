@@ -10,12 +10,19 @@ export default {
         next: '',
         date: '',
         nextDate: '',
-        eventsId: [
-            // '66ed195519b4026e742585b0',
-            // '66ed5fe30840463b66a487ed',
+        todayTime: [
+
         ],
-        eventsTime: [
-            'Событий нет'
+        tomorrowTime: [
+
+        ],
+        eventsId: [
+        ],
+        todayEvents: [
+            'Ничего не запланировано'
+        ],
+        tomorrowEvents: [
+            'Ничего не запланировано'
         ],
         weekDays: [
         ' Воскресенье',
@@ -47,9 +54,7 @@ export default {
         this.fetch()
     },
 
-methods:{
-
-    
+methods:{    
     getDayOfWeek(shift){
         let day = new Date().getDay() + shift
         while (day >= 7){
@@ -60,28 +65,131 @@ methods:{
     async fetch()
     {
         this.day = this.getDayOfWeek(this.shift);
-        this.next = this.getDayOfWeek(this.shift + 1)
-        this.date = this.getDay(this.shift)
-        this.nextDate = this.getDay(this.hift + 1)
+        this.next = this.getDayOfWeek(this.shift + 1);
+        this.date = this.getDay(this.shift);
+        this.nextDate = this.getDay(this.shift + 1);
+        localStorage.setItem('user', JSON.stringify({userId: "66ed6be90840463b66a487fa", email: "hello13224@yandex.ru", password: "some_password" }));
+        let user = localStorage.getItem('user');
+        try {
+            const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/events', {
+                params:{
+                    userId: user},})
+                    let data = JSON.parse(response.data)
+                    for(let i = 0; i < data.User.Events.length; i++)
+                    {
+                        this.eventsId.push(data.User.Events[i])
+                    }
+        }
+        catch(error) {
+            console.error('Error fetching preferences:', error);
+        }
+
         
+        const event0 = {}
+        event0.start_time = "Сентября 21 13:00"
+        event0.end_time = "Сентября 21 15:00"
+        
+        const event1 = {}
+        event1.start_time = "Сентября 22 12:00"
+        event1.end_time = "Сентября 22 14:20"
+
+        const event2 = {}
+        event2.start_time = "Сентября 23 12:00"
+        event2.end_time = "Сентября 23 14:30"
+
+        const event3 = {}
+        event3.start_time = "Сентября 21 14:00"
+        event3.end_time = "Сентября 21 17:00"
+
+        const event4 = {}
+        event4.start_time = "Сентября 21 14:00"
+        event4.end_time = "Сентября 21 17:00"
+
+        const event5 = {}
+        event5.start_time = "Сентября 21 14:00"
+        event5.end_time = "Сентября 21 17:00"
+
+        const event6 = {}
+        event6.start_time = "Сентября 21 14:00"
+        event6.end_time = "Сентября 21 17:00"
+
+        const event7 = {}
+        event7.start_time = "Сентября 21 14:00"
+        event7.end_time = "Сентября 21 17:00"
+
+        const event8 = {}
+        event8.start_time = "Сентября 21 14:00"
+        event8.end_time = "Сентября 21 17:00"
+
+        const event9 = {}
+        event9.start_time = "Сентября 21 14:00"
+        event9.end_time = "Сентября 21 17:00"
+
+        const event10 = {}
+        event10.start_time = "Сентября 21 14:00"
+        event10.end_time = "Сентября 21 17:00"
+        
+        const events = [
+            event0, 
+            event1,
+            event2,
+            event3,
+            event4,
+            event5,
+            event6,
+            event7,
+            event8,
+            event9,
+            event10
+        ]
+
+        console.log(events)
+
+        for(let i = 0; i < events.length; i++)
+        {
+            let time = events[i].start_time.split(' ');
+
+            if(time[1] + ' ' + time[0] == this.date)
+            {
+                this.todayTime.push(time[2] + " - " + events[i].end_time.split(' ')[2])
+            }
+            else if(time[1] + ' ' + time[0] == this.nextDate)
+            {
+                this.tomorrowTime.push(time[2] + " - " + events[i].end_time.split(' ')[2])
+            }
+        }
+
+
+        // try{
+        //     const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/getEvent', {
+        //         params:{
+        //             id: this.eventsId[0]
+        //         }
+        //     })
+        //     console.log(this.eventsId[0])
+        //     console.log(response)
+        //     // let data = JSON.parse(response.data)
+        //     // console.log(data)
+        //     for(let i = 0; i < data.User.Events.length; i++)
+        //         {
+        //             this.eventsId.push(data.User.Events[i])
+        //         }
+
+        // }
+        // catch(error)
+        // {
+
+        // }
+
         for(let i = 0; i < this.eventsId.length; i++)
         {
-            this.eventsTime[i] = this.eventsId[i]
+            this.todayEvents[i] = this.eventsId[i];
         }
-    //     try {
-    //     const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/events'); // URL нашего бэкенда
-    //     this.preferences = JSON.parse(response.data).map(item => item.EventId);
-        
-    //     console.info(JSON.parse(response.data).map(item => item.EventId));
-
-    //   } catch (error) {
-    //     console.error('Error fetching preferences:', error);
-    //   }
 
     },
 
         getDay(shift){
-            let d = new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * this.shift).getDate()  + this.months[new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * this.shift).getMonth()]
+            let d = new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * shift).getDate()  + this.months[new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * shift).getMonth()]
             return d
         }
     }
@@ -91,14 +199,15 @@ methods:{
 <template>
     <div class="calendar">
         <div class="date">
-          <p>Сегодня</p>
+          <p color="#ffdfdf">Сегодня</p>
           <p>{{ day }} {{ date }}</p>
-          <p v-for="(id, index) in eventsTime"> {{ id }}</p>
+          <p v-for="(id, index) in todayTime"> {{ id }}</p>
           
         </div>  
         <div class="date">
             <p>Завтра</p>
             <p>{{ next }} {{ nextDate }}</p>
+            <p v-for="(id, index) in tomorrowTime"> {{ id }}</p>
 
         </div>
     </div>
@@ -109,22 +218,31 @@ methods:{
     .calendar
     {
         display: flex;
+        position: relative;
         flex-direction: column;
-        justify-content: space-between;
+        flex-wrap: wrap;
+        justify-content: flex-start;
         min-height: 350px;
-        height: fit-content;
-        width: 120%;
+        max-height: 600px;
+        margin-top: 7%;
+        align-items: center;
+        top: 0px;
+        width: 80%;
+        left: 10%;
     }
 
     .date
     {
-        width: 20%;
+        width: 35%;
         height:fit-content;
         min-height: 40%;
         display: flex;
         flex-direction: column;
         background-color: #a940b9;
+        color: #f0bcf0;
         border-radius: 10%;
+        margin-top: 2%;
+        text-align: center;
     }
 
 

@@ -36,11 +36,17 @@ namespace MyApi
                     return Results.Ok(jsonResult);
                 });
 
-                    app.MapGet("/api/events", async (UserService userService) =>
+                    app.MapGet("/api/events", async (UserService userService, string userId) =>
                     {
-                        var jsonResult = await userService.GetUserJSON();
+                        var jsonResult = await userService.GetUserByIdAsyncJSON(userId);
                         return Results.Ok(jsonResult);
                     });
+
+                        app.MapGet("/api/getEvent", async (EventService eventService, string id) =>
+                        {
+                            var jsonResult = await eventService.GetEventByIdAsyncJSON(id);
+                            return Results.Ok(jsonResult);
+                        });
 
 
  /*           app.MapPost("/api/settings", async (UserSettings userSettings, UserService userService) =>
