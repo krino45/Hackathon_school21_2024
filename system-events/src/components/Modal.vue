@@ -48,7 +48,7 @@
     }
     
     .modal-content {
-        width: 400px;
+        width: 50%;
         padding: 20px;
         border-radius: 5px;
         background-color: white;
