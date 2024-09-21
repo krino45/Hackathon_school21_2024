@@ -82,8 +82,10 @@ namespace MyApi.Models
             }
         }
 
-        public static bool ValidatePassword(string enteredPassword, string storedPasswordHash, string storedSalt)
+        public static bool ValidatePassword(string enteredPassword, string? storedPasswordHash, string? storedSalt)
         {
+            if (string.IsNullOrWhiteSpace(storedPasswordHash) || string.IsNullOrWhiteSpace(storedSalt))
+                return false;
             using (var deriveBytes = new Rfc2898DeriveBytes(enteredPassword, Convert.FromBase64String(storedSalt), Iterations))
             {
                 byte[] enteredHashBytes = deriveBytes.GetBytes(KeySize);
