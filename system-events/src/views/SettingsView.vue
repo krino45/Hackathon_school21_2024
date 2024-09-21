@@ -1,86 +1,73 @@
-<script>
+<script setup>
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import ToggleButton from '../components/ToggleButton.vue'
+import ToggleButton from '../components/ToggleButton.vue';
+import HeaderCustom from '@src/components/Header.vue';
 
-export default {
-  name: 'SettingsView',
-  components: { ToggleButton },
-  data() {
-    return {
-      preferences: [],
-      selectedPreferences: [],
-      email: '',
-      oldEmail: '',
-      password: '',
-      editEmail: false,
-      editPassword: false,
-      newsletter: false,
-    };
-  },
+// Работа с данными через `ref`, более удобный подход для Composition API
+const preferences = ref([]);
+const selectedPreferences = ref([]);
+const email = ref('');
+const password = ref('');
+const editEmail = ref(false);
+const editPassword = ref(false);
+const newsletter = ref(false);
 
-  mounted() {
-    this.fetchPreferences(); // Вызов метода при загрузке страницы
-    localStorage.setItem('user', JSON.stringify({ id: "66ed6be90840463b66a487fa", email: "hello13224@yandex.ru", password: "some_password" }));
-  },
+// Загрузка данных при монтировании компонента
+onMounted(() => {
+  fetchPreferences();
+  const userData = localStorage.getItem('user');
+  const user = JSON.parse(userData);
+  email.value = user.email;
+  password.value = user.password;
+  localStorage.setItem('user', JSON.stringify(user));
+});
 
-  methods: {
-    async fetchPreferences() {
-      try {
-        const userData = localStorage.getItem('user');
-        const user = JSON.parse(userData);
-        this.email = user.email;
-        this.password = user.password;
+// Функция для получения предпочтений
+const fetchPreferences = async () => {
+  try {
+    const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/preferences');
+    preferences.value = JSON.parse(response.data).map(item => item.Tag);
+  } catch (error) {
+    console.error('Error fetching preferences:', error);
+  }
+};
 
-        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/preferences'); // URL нашего бэкенда
-        this.preferences = JSON.parse(response.data).map(item => item.Tag);
-        
-        console.info(JSON.parse(response.data).map(item => item.Tag));
+// Функция для сохранения изменений
+const saveChanges = async () => {
+  try {
+    const userData = localStorage.getItem('user');
+    const user = JSON.parse(userData);
+    const response = await axios.post(import.meta.env.VITE_NODE_API_HOST + '/api/settings', {
+      id: user.id,
+      email: email.value,
+      password: password.value,
+      preferences: selectedPreferences.value
+    });
+    console.log('Response:', response.data);
+  } catch (error) {
+    console.error('There was an error!', error);
+  }
+};
 
-        // response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "api/email");
-        // this.email = JSON.parse(response.data).email;
-        
-
-      } catch (error) {
-        console.error('Error fetching preferences:', error);
-      }
-    },
-
-    togglePreference(preference) {
-      const index = this.selectedPreferences.indexOf(preference);
-      if (index === -1) {
-        this.selectedPreferences.push(preference);
-      } else {  
-        this.selectedPreferences.splice(index, 1);
-      }
-      console.log(this.selectedPreferences);
-    },
-
-    async saveChanges() {
-      try {
-        const userData = localStorage.getItem('user');
-        const user = JSON.parse(userData);
-        const response = await axios.post(import.meta.env.VITE_NODE_API_HOST + '/api/settings', {
-          id: user.id,
-          email: this.email,
-          password: this.password,
-          preferences: this.selectedPreferences
-        });
-        console.log('Response:', response.data);
-      } catch (error) {
-        console.error('There was an error!', error);
-      }
-    }
-    
+// Функция переключения предпочтений
+const togglePreference = (preference) => {
+  const index = selectedPreferences.value.indexOf(preference);
+  if (index === -1) {
+    selectedPreferences.value.push(preference);
+  } else {
+    selectedPreferences.value.splice(index, 1);
   }
 };
 </script>
 
 <template>
+  <HeaderCustom />
+
   <div class="container">
     <div class="settings-container">
       <h1>Настройки профиля</h1>
 
-      <!-- Блок изменения почты -->
       <section class="settings-section">
         <div class="section-header">
           <h2>Почта</h2>
@@ -98,7 +85,6 @@ export default {
         </div>
       </section>
 
-      <!-- Блок изменения пароля -->
       <section class="settings-section">
         <div class="section-header">
           <h2>Пароль</h2>
@@ -117,257 +103,106 @@ export default {
         </div>
       </section>
 
-      <!-- Блок предпочтений -->
       <section class="settings-section">
         <h2>Предпочтения</h2>
-          <div class="preferences">
-            <toggleButton 
-              v-for="(preference, index) in preferences" 
-              :key="index" 
-              :label="preference"
-              @toggle="togglePreference(preference)"
-              :active="selectedPreferences.includes(preference)"
-            />
-          </div>
+        <div class="preferences">
+          <toggleButton 
+            v-for="(preference, index) in preferences" 
+            :key="index" 
+            :label="preference"
+            @toggle="togglePreference(preference)"
+            :active="selectedPreferences.includes(preference)"
+          />
+        </div>
       </section>
 
-      <!-- Кнопка сохранения изменений -->
       <button @click="saveChanges()" class="save-button">Сохранить изменения</button>
     </div>
   </div>
 </template>
 
 <style scoped>
+  .container {
+    margin-top: 150px;
+    background-color: white;
+  }
 
-.container {
-  background-color: white;
-}
+  /* Общие стили */
+  .settings-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
 
-/* Общие стили */
-.settings-container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f4f4f4;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
+  h1, h2 {
+    text-align: center;
+    color: #6a0dad;
+  }
 
-/* Заголовки */
-h1 {
-  text-align: center;
-  color: #6a0dad;
-}
+  /* Блоки настроек */
+  .settings-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
 
-h2 {
-  margin-bottom: 10px;
-  color: #4b0082;
-}
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-/* Блоки настроек */
-.settings-section {
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
+  .edit-icon {
+    cursor: pointer;
+    font-size: 18px;
+    color: #6a0dad;
+  }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  .input-group {
+    margin-top: 10px;
+    width: 100%;
+  }
 
-/* Иконка редактирования */
-.edit-icon {
-  cursor: pointer;
-  font-size: 18px;
-  color: #6a0dad;
-}
+  .settings-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    color: #333;
+  }
 
-/* Инпуты */
-.input-group {
-  margin-top: 10px;
-  width: 95%;
-}
+  .settings-input:disabled {
+    background-color: #e0e0e0;
+    color: #999;
+  }
 
-.settings-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
-  color: #333;
-}
+  .preferences {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 
-.settings-input:disabled {
-  background-color: #e0e0e0;
-  color: #999;
-}
+  .save-button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #6a0dad;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
 
-/* Чекбоксы предпочтений */
-.preferences-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.preference-item {
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: #4b0082;
-}
-
-input[type="checkbox"] {
-  margin-right: 10px;
-}
-
-.edit-button {
-  background-color: white;
-  border-radius: 10px;
-  border-width: 2px;
-  border-style: solid;
-  border-color: #6a0dad;
-}
-
-/* Кнопка сохранения */
-.save-button {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  background-color: #6a0dad;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.save-button:hover {
-  background-color: #5b0ba3;
-}
-
-.preferences {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.container {
-  background-color: white;
-}
-
-/* Общие стили */
-.settings-container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f4f4f4;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Заголовки */
-h1 {
-  text-align: center;
-  color: #6a0dad;
-}
-
-h2 {
-  margin-bottom: 10px;
-  color: #4b0082;
-}
-
-/* Блоки настроек */
-.settings-section {
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Иконка редактирования */
-.edit-icon {
-  cursor: pointer;
-  font-size: 18px;
-  color: #6a0dad;
-}
-
-/* Инпуты */
-.input-group {
-  margin-top: 10px;
-  width: 95%;
-}
-
-.settings-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
-  color: #333;
-}
-
-.settings-input:disabled {
-  background-color: #e0e0e0;
-  color: #999;
-}
-
-/* Чекбоксы предпочтений */
-.preferences-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.preference-item {
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: #4b0082;
-}
-
-input[type="checkbox"] {
-  margin-right: 10px;
-}
-
-.edit-button {
-  background-color: white;
-  border-radius: 10px;
-  border-width: 2px;
-  border-style: solid;
-  border-color: #6a0dad;
-}
-
-/* Кнопка сохранения */
-.save-button {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  background-color: #6a0dad;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.save-button:hover {
-  background-color: #5b0ba3;
-}
-
-.preferences {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
+  .save-button:hover {
+    background-color: #5b0ba3;
+  }
 </style>
-
