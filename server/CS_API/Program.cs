@@ -43,7 +43,7 @@ namespace MyApi
                     });
 
 
-            app.MapPost("/api/settings", async (UserSettings userSettings, UserService userService) =>
+ /*           app.MapPost("/api/settings", async (UserSettings userSettings, UserService userService) =>
             {
                 if (userSettings == null)
                     return Results.BadRequest("Invalid data.");
@@ -51,7 +51,7 @@ namespace MyApi
                 var result = await userService.SaveChanges(userSettings);
 
                 return Results.Ok(result);
-            });
+            });*/
 
             app.Run("http://localhost:5258");
         }
