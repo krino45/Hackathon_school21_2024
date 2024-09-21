@@ -12,10 +12,11 @@ namespace MyApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddCors();
-            builder.Services.AddSingleton<IMongoClient>(s => new MongoClient(Environment.GetEnvironmentVariable("MONGODB_URI")));
-            builder.Services.AddScoped<TagService>();
-            builder.Services.AddScoped<UserService>();
+                builder.Services.AddCors();
+                builder.Services.AddSingleton<IMongoClient>(s => new MongoClient(Environment.GetEnvironmentVariable("MONGODB_URI")));
+                builder.Services.AddScoped<TagService>();
+                builder.Services.AddScoped<EventService>();
+                builder.Services.AddScoped<UserService>();
 
             var app = builder.Build();
             app.UseCors(policy => policy
@@ -28,6 +29,13 @@ namespace MyApi
                 var jsonResult = await tagService.GetTagCollectionJSON();
                 return Results.Ok(jsonResult);
             });
+
+                app.MapGet("/api/get_all_events", async (EventService eventService) =>
+                {
+                    var jsonResult = await eventService.GetAllEventsAsyncJSON();
+                    return Results.Ok(jsonResult);
+                });
+
 
             app.MapPost("/api/settings", async (UserSettings userSettings, UserService userService) =>
             {

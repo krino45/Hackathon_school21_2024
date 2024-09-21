@@ -254,4 +254,120 @@ input[type="checkbox"] {
   flex-wrap: wrap;
   justify-content: center;
 }
+.container {
+  background-color: white;
+}
+
+/* Общие стили */
+.settings-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовки */
+h1 {
+  text-align: center;
+  color: #6a0dad;
+}
+
+h2 {
+  margin-bottom: 10px;
+  color: #4b0082;
+}
+
+/* Блоки настроек */
+.settings-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Иконка редактирования */
+.edit-icon {
+  cursor: pointer;
+  font-size: 18px;
+  color: #6a0dad;
+}
+
+/* Инпуты */
+.input-group {
+  margin-top: 10px;
+  width: 95%;
+}
+
+.settings-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+.settings-input:disabled {
+  background-color: #e0e0e0;
+  color: #999;
+}
+
+/* Чекбоксы предпочтений */
+.preferences-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.preference-item {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #4b0082;
+}
+
+input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.edit-button {
+  background-color: white;
+  border-radius: 10px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #6a0dad;
+}
+
+/* Кнопка сохранения */
+.save-button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #6a0dad;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.save-button:hover {
+  background-color: #5b0ba3;
+}
+
+.preferences {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 </style>
+
