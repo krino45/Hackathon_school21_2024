@@ -23,6 +23,7 @@ namespace MyApi
         {
             try
             {
+                await Console.Out.WriteLineAsync("JSON FROM ADD ASYNC: " + json);
                 var jsonObj = JObject.Parse(json);
 
                 if (!jsonObj.ContainsKey("eventType"))
@@ -91,7 +92,7 @@ namespace MyApi
                     return JsonConvert.SerializeObject(new { Success = false, Message = "Event not found." });
                 }
 
-                return JsonConvert.SerializeObject(new { Success = true, Message = _event });
+                return JsonConvert.SerializeObject(new { Success = true, data = _event });
             }
             catch (JsonException ex)
             {
