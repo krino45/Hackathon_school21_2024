@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import ToggleButton from '../components/ToggleButton.vue';
+import ToggleButton from '@src/components/ToggleButton.vue';
 import HeaderCustom from '@src/components/Header.vue';
 
 // Работа с данными через `ref`, более удобный подход для Composition API
@@ -14,7 +14,7 @@ const editPassword = ref(false);
 const newsletter = ref(false);
 
 // Загрузка данных при монтировании компонента
-onMounted(() => {
+onMounted(async () => {
   fetchPreferences();
   const userData = localStorage.getItem('user');
   const user = JSON.parse(userData);
@@ -62,6 +62,7 @@ const togglePreference = (preference) => {
 </script>
 
 <template>
+
   <HeaderCustom />
 
   <div class="container">
