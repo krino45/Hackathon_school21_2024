@@ -2,14 +2,39 @@
     import { ref } from 'vue';
 
     const isLogin = ref(true);
+    const email = ref('');
+    const password = ref('');
+    const firstName = ref('');
+    const lastName = ref('');
 
     const showLogin = () => {
         isLogin.value = true;
-    }
+    };
 
     const showRegister = () => {
         isLogin.value = false;
-    }
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        let url = 'http://localhost:5258/login';
+        let payload = isLogin.value 
+        ? { email: email.value, password: password.value }
+        : { firstName: firstName.value, lastName: lastName.value, email: email.value, password: password.value };
+
+        let response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        let result = await response.json();
+
+        console.log(result)
+    };
 
 </script>
 
@@ -23,15 +48,15 @@
 
             <div class="login-block" v-if="isLogin">
                 <h1>Вход</h1>
-                <form action="" class="fm-block">
+                <form @submit.prevent="handleSubmit" class="fm-block">
                     <div class="field-form">
-                        <label for="">Почта</label>
-                        <input type="text">
+                        <label for="login-email">Почта</label>
+                        <input type="text" id="login-email" v-model="email">
                     </div>
 
                     <div class="field-form">
-                        <label for="">Пароль</label>
-                        <input type="password">
+                        <label for="login-password">Пароль</label>
+                        <input type="password" id="login-password" v-model="password">
                     </div>
                     
                     <input type="submit" id="sub-block" value="Вход">
@@ -39,22 +64,22 @@
             </div>
             <div class="reg-block" v-else>
                 <h1>Регистрация</h1>
-                <form action="" class="fm-block">
+                <form @submit.prevent="handleSubmit" class="fm-block">
                     <div class="field-form">
-                        <label for="">Имя</label>
-                        <input type="text" required>
+                        <label for="first-name">Имя</label>
+                        <input type="text" id="first-name" v-model="firstName" required>
                     </div>
                     <div class="field-form">
-                        <label for="">Фамилия</label>
-                        <input type="text" required>
+                        <label for="last-name">Фамилия</label>
+                        <input type="text" id="last-name" v-model="lastName" required>
                     </div>
                     <div class="field-form">
-                        <label for="">Почта</label>
-                        <input type="email" required>
+                        <label for="register-email">Почта</label>
+                        <input type="email" id="register-email" v-model="email" required>
                     </div>
                     <div class="field-form">
-                        <label for="">Пароль</label>
-                        <input type="password" required>
+                        <label for="register-password">Пароль</label>
+                        <input type="password" id="register-password" v-model="password" required>
                     </div>
 
                     <input type="submit" id="sub-block" value="Зарегистрироваться">
