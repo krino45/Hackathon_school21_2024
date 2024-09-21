@@ -1,8 +1,6 @@
 ﻿using MongoDB.Driver;
 using MyApi.Models;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MyApi
 {
