@@ -73,117 +73,60 @@ methods:{
         this.next = this.getDayOfWeek(this.shift + 1);
         this.date = this.getDay(this.shift);
         this.nextDate = this.getDay(this.shift + 1);
+        let data;
+        let events = []
         localStorage.setItem('user', JSON.stringify({userId: "66ed6be90840463b66a487fa", email: "hello13224@yandex.ru", password: "some_password" }));
         let user = localStorage.getItem('user');
         try {
-            const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/events', {
+            const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user', {
                 params:{
-                    userId: user},})
-                    let data = JSON.parse(response.data)
+                    userJsonId: user},})    
+                    data = JSON.parse(response.data)
                     for(let i = 0; i < data.User.Events.length; i++)
                     {
-                        this.eventsId.push(data.User.Events[i])
+                        events.push(data.User.Events[i])
                     }
         }
         catch(error) {
             console.error('Error fetching preferences:', error);
         }
 
-        
-        const event0 = {}
-        event0.start_time = "Сентября 21 13:00"
-        event0.end_time = "Сентября 21 15:00"
-        
-        const event1 = {}
-        event1.start_time = "Сентября 22 12:00"
-        event1.end_time = "Сентября 22 14:20"
+        try{
+            let obj = {}
+            obj.id = events[1]
+            console.log(obj)
+            const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_event', {
+                params:{
+                    json: JSON.stringify(obj)
+                }
+            })
+            console.log(this.eventsId[0])
+            let data = JSON.parse(response.data)
+            console.log(data)
+            for(let i = 0; i < data.User.Events.length; i++)
+                {
+                    this.eventsId.push(data.User.Events[i])
+                }
 
-        const event2 = {}
-        event2.start_time = "Сентября 23 12:00"
-        event2.end_time = "Сентября 23 14:30"
-
-        const event3 = {}
-        event3.start_time = "Сентября 21 14:00"
-        event3.end_time = "Сентября 21 17:00"
-
-        const event4 = {}
-        event4.start_time = "Сентября 21 14:00"
-        event4.end_time = "Сентября 21 17:00"
-
-        const event5 = {}
-        event5.start_time = "Сентября 21 14:00"
-        event5.end_time = "Сентября 21 17:00"
-
-        const event6 = {}
-        event6.start_time = "Сентября 21 14:00"
-        event6.end_time = "Сентября 21 17:00"
-
-        const event7 = {}
-        event7.start_time = "Сентября 21 14:00"
-        event7.end_time = "Сентября 21 17:00"
-
-        const event8 = {}
-        event8.start_time = "Сентября 21 14:00"
-        event8.end_time = "Сентября 21 17:00"
-
-        const event9 = {}
-        event9.start_time = "Сентября 21 14:00"
-        event9.end_time = "Сентября 21 17:00"
-
-        const event10 = {}
-        event10.start_time = "Сентября 21 14:00"
-        event10.end_time = "Сентября 21 17:00"
-        
-        const events = [
-            event0, 
-            event1,
-            event2,
-            event3,
-            event4,
-            event5,
-            event6,
-            event7,
-            event8,
-            event9,
-            event10
-        ]
-
-        console.log(events)
-
-        for(let i = 0; i < events.length; i++)
+        }
+        catch(error)
         {
-            let time = events[i].start_time.split(' ');
 
-            if(time[1] + ' ' + time[0] == this.date)
-            {
-                this.todayTime.push(time[2] + " - " + events[i].end_time.split(' ')[2])
-            }
-            else if(time[1] + ' ' + time[0] == this.nextDate)
-            {
-                this.tomorrowTime.push(time[2] + " - " + events[i].end_time.split(' ')[2])
-            }
         }
 
 
-        // try{
-        //     const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/getEvent', {
-        //         params:{
-        //             id: this.eventsId[0]
-        //         }
-        //     })
-        //     console.log(this.eventsId[0])
-        //     console.log(response)
-        //     // let data = JSON.parse(response.data)
-        //     // console.log(data)
-        //     for(let i = 0; i < data.User.Events.length; i++)
-        //         {
-        //             this.eventsId.push(data.User.Events[i])
-        //         }
-
-        // }
-        // catch(error)
+        // for(let i = 0; i < events.length; i++)
         // {
+        //     let time = events[i].start_time.split(' ');
 
+        //     if(time[1] + ' ' + time[0] == this.date)
+        //     {
+        //         this.todayTime.push(time[2] + " - " + events[i].end_time.split(' ')[2])
+        //     }
+        //     else if(time[1] + ' ' + time[0] == this.nextDate)
+        //     {
+        //         this.tomorrowTime.push(time[2] + " - " + events[i].end_time.split(' ')[2])
+        //     }
         // }
 
         for(let i = 0; i < this.eventsId.length; i++)

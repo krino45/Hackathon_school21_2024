@@ -46,7 +46,12 @@ namespace MyApi
             app.MapGet("/api/get_all_events", async (EventService eventService) =>
             {
                 var jsonResult = await eventService.GetAllEventsAsyncJSON();
-                Console.WriteLine(jsonResult);
+                return Results.Ok(jsonResult);
+            });
+
+            app.MapGet("/api/get_event", async (EventService eventService, string json) =>
+            {
+                var jsonResult = await eventService.GetEventByIdAsyncJSON(json);
                 return Results.Ok(jsonResult);
             });
 
