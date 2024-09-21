@@ -16,7 +16,9 @@ using MongoDB.Driver;
 
             var app = builder.Build();
                 app.UseCors(policy => policy
-                .AllowAnyOrigin());
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
 
                 app.MapGet("/api/preferences", async (TagService tagService) =>
                 {
@@ -26,7 +28,7 @@ using MongoDB.Driver;
 
                 app.MapGet("/api/events", async (EventService eventService) =>
                 {
-                    var jsonResult = await tagService.GetEventCollectionJSON();
+                    var jsonResult = await eventService.GetEventCollectionJSON();
                     return Results.Ok(jsonResult);
                 });
 

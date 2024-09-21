@@ -1,55 +1,80 @@
-<script setup>
+<script>
+import axios from 'axios';
 import { ref, onMounted } from 'vue'
+export default {
 
-const shift = 0
-const day = ref('')
-const next = ref('')
-const date = ref('')
-const nextDate = ref('')
-const weekDays = [
-  ' Воскресенье',
-  ' Понедельник',
-  ' Вторник',
-  ' Среда',
-  ' Четверг',
-  ' Пятница',
-  ' Суббота',
-]
-const months = [
-    ' Января', 
-    ' Февраля',
-    ' Марта',
-    ' Апреля',
-    ' Мая',
-    ' Июня',
-    ' Июля',
-    ' Августа',
-    ' Сентября',
-    ' Октября',
-    ' Ноября',
-    ' Декабря'
-]
+    data(){
+        return {
+        shift: 0,
+        day: '',
+        next: '',
+        date: '',
+        nextDate: '',
+        eventId: 0,
+        weekDays: [
+        ' Воскресенье',
+        ' Понедельник',
+        ' Вторник',
+        ' Среда',
+        ' Четверг',
+        ' Пятница',
+        ' Суббота',
+        ],
+        months: [
+            ' Января', 
+            ' Февраля',
+            ' Марта',
+            ' Апреля',
+            ' Мая',
+            ' Июня',
+            ' Июля',
+            ' Августа',
+            ' Сентября',
+            ' Октября',
+            ' Ноября',
+            ' Декабря'
+        ]
+        };
+    },
 
-onMounted(() => {
-  day.value = getDayOfWeek(shift)
-  next.value = getDayOfWeek(shift + 1)
-  date.value = getDay(shift)
-  nextDate.value = getDay(shift + 1)
-})
+    mounted(){
+        this.fetch()
+    },
 
-const getDayOfWeek = (shift) => {
-    let day = new Date().getDay() + shift
-    while (day >= 7){
-        day = day - 7
+methods:{
+
+    
+    getDayOfWeek(shift){
+        let day = new Date().getDay() + shift
+        while (day >= 7){
+            day = day - 7
+        }
+        return this.weekDays[day]
+    },
+    async fetch()
+    {
+        this.day = this.getDayOfWeek(this.shift);
+        this.next = this.getDayOfWeek(this.shift + 1)
+        this.date = this.getDay(this.shift)
+        this.nextDate = this.getDay(this.hift + 1)
+        try {
+        const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/events'); // URL нашего бэкенда
+        this.preferences = JSON.parse(response.data).map(item => item.EventId);
+        
+        console.info(JSON.parse(response.data).map(item => item.EventId));
+
+      } catch (error) {
+        console.error('Error fetching preferences:', error);
+      }
+
+    },
+
+        getDay(shift){
+            let d = new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * this.shift).getDate()  + this.months[new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * this.shift).getMonth()]
+            return d
+        }
     }
-    return weekDays[day]
 }
-
-const getDay = (shift) => {
-    let d = new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * shift).getDate()  + months[new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * shift).getMonth()]
-    return d
-}
-
 </script>
 
 <template>
@@ -61,7 +86,8 @@ const getDay = (shift) => {
         </div>  
         <div class="date">
             <p>Завтра</p>
-            <p>{{ next }} {{ nextDate }}</p>
+            <p>{{ next }} {{ nextDate }} Ивент:{{ eventId }}</p>
+
         </div>
     </div>
 </template>
@@ -80,7 +106,7 @@ const getDay = (shift) => {
 
     .date
     {
-        width: 100%;
+        width: 20%;
         height:fit-content;
         min-height: 40%;
         display: flex;

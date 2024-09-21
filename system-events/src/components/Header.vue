@@ -61,6 +61,7 @@
         position: relative;
         width: 20%;
         top: 30%;
+        right: -1%;
     }
 
     .menu
