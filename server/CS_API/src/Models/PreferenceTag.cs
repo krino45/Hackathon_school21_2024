@@ -17,6 +17,5 @@ namespace MyApi.Models
         {
             Tag = tag;
         }
-
     }
 }
