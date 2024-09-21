@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+const shift = 0
 const day = ref('')
 const next = ref('')
 const date = ref('')
@@ -30,10 +31,10 @@ const months = [
 ]
 
 onMounted(() => {
-  day.value = getDayOfWeek(0)
-  next.value = getDayOfWeek(1)
-  date.value = getDay(0)
-  nextDate.value = getDay(1)
+  day.value = getDayOfWeek(shift)
+  next.value = getDayOfWeek(shift + 1)
+  date.value = getDay(shift)
+  nextDate.value = getDay(shift + 1)
 })
 
 const getDayOfWeek = (shift) => {
@@ -52,20 +53,41 @@ const getDay = (shift) => {
 </script>
 
 <template>
-  <div>
-    <div id="np-container">
+    <div class="calendar">
         <div class="date">
-          <p>Today is {{ day }} {{ date }}</p>
+          <p>Сегодня</p>
+          <p>{{ day }} {{ date }}</p>
+          
         </div>  
         <div class="date">
-            <p>Tomorrow is {{ next }} {{ nextDate }}</p>
+            <p>Завтра</p>
+            <p>{{ next }} {{ nextDate }}</p>
         </div>
     </div>
-  </div>
 </template>
 
 <style scoped>
-#np-container {
-  padding: 10px;
-}
+
+    .calendar
+    {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 350px;
+        height: fit-content;
+        width: 120%;
+    }
+
+    .date
+    {
+        width: 100%;
+        height:fit-content;
+        min-height: 40%;
+        display: flex;
+        flex-direction: column;
+        background-color: #a940b9;
+        border-radius: 10%;
+    }
+
+
 </style>
