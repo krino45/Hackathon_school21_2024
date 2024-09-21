@@ -1,39 +1,47 @@
 <script setup>
-    import { ref } from 'vue';
+    import { ref } from 'vue'
 
-    const isLogin = ref(true);
-    const email = ref('');
-    const password = ref('');
-    const firstName = ref('');
-    const lastName = ref('');
+    const isLogin = ref(true)
+    const email = ref('')
+    const password = ref('')
+    const firstName = ref('')
+    const lastName = ref('')
+    const surname = ref('')
 
     const showLogin = () => {
-        isLogin.value = true;
+        isLogin.value = true
     };
 
     const showRegister = () => {
-        isLogin.value = false;
+        isLogin.value = false
     };
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
+        event.preventDefault()
 
-        let url = 'http://localhost:5258/login';
+        let url = `${import.meta.env.VITE_NODE_API_HOST}/login`;
         let payload = isLogin.value 
         ? { email: email.value, password: password.value }
-        : { firstName: firstName.value, lastName: lastName.value, email: email.value, password: password.value };
+        : { firstName: firstName.value, lastName: lastName.value, surname: surname.value, email: email.value, password: password.value }
 
-        let response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(payload)
-        });
-        
-        let result = await response.json();
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
 
-        console.log(result)
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json()
+            console.log('Response Data:', data)
+        } catch (error) {
+                console.error('Error:', error)
+        }
     };
 
 </script>
@@ -72,6 +80,10 @@
                     <div class="field-form">
                         <label for="last-name">Фамилия</label>
                         <input type="text" id="last-name" v-model="lastName" required>
+                    </div>
+                    <div class="field-form">
+                        <label for="last-name">Отчество</label>
+                        <input type="text"  id="surname" v-model="surname" required>
                     </div>
                     <div class="field-form">
                         <label for="register-email">Почта</label>
@@ -153,7 +165,7 @@
 
     .reg-block {
         width: 50vh;
-        height: 40vh;
+        height: 50vh;
 
         display: flex;
         flex-direction: column;
