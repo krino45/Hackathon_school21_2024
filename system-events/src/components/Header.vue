@@ -1,63 +1,101 @@
 <script setup>
-    import { ref, onMounted, onUnmounted, computed } from 'vue';
-    import { useRoute } from 'vue-router';
-    import Button from '@src/components/Button.vue';
-    import Modal from '@src/components/Modal.vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import Button from '@src/components/Button.vue';
+import Modal from '@src/components/Modal.vue';
+import ToggleButton from '@src/components/ToggleButton.vue';
+import axios from 'axios';
 
-    const isDropdownOpen = ref(false);
-    const isModalOpen = ref(false);
-    const eventType = ref('');
-    const eventName = ref('');
-    const eventLocation = ref('');
-    const startTime = ref('');
-    const endTime = ref('');
-    const minAttendees = ref('');
+const isDropdownOpen = ref(false);
+const isModalOpen = ref(false);
+const eventType = ref('t1'); // Set default as t1
+const eventName = ref('');
+const eventLocation = ref('');
+const startTime = ref('');
+const endTime = ref('');
+const minAttendees = ref('');
+const invitedAttendees = ref(''); // For t1 emails
+const roundtableId = ref('1'); // For t2 combobox
+const preferences = ref([]); // For t3 and t4 preferences
+const selectedPreferences = ref([]);
 
-    const route = useRoute();
+const route = useRoute();
 
-    const showControls = computed(() => {
-        return !['/settings'].includes(route.path);
-    });
+const showControls = computed(() => {
+    return !['/settings'].includes(route.path);
+});
 
-    const toggleDropdown = () => {
-        isDropdownOpen.value = !isDropdownOpen.value;
-    };
+const toggleDropdown = () => {
+    isDropdownOpen.value = !isDropdownOpen.value;
+};
 
-    const toggleModal = () => {
-        isModalOpen.value = !isModalOpen.value;
-    };
+const toggleModal = () => {
+    isModalOpen.value = !isModalOpen.value;
+};
 
-    const handleClickOutside = (event) => {
-        const dropdown = document.querySelector('.panel-nav');
-        if (dropdown && !dropdown.contains(event.target)) {
-            isDropdownOpen.value = false;
-        }
-    };
-
-    const handleClickExit = () => {
-        localStorage.removeItem('user');
+const handleClickOutside = (event) => {
+    const dropdown = document.querySelector('.panel-nav');
+    if (dropdown && !dropdown.contains(event.target)) {
+        isDropdownOpen.value = false;
     }
+};
 
-    const handleSubmit = () => {
-        console.log({
-            eventType: eventType.value,
-            eventName: eventName.value,
-            eventLocation: eventLocation.value,
-            startTime: startTime.value,
-            endTime: endTime.value,
-            minAttendees: minAttendees.value,
-        });
+const handleClickExit = () => {
+    localStorage.removeItem('user');
+};
 
-        toggleModal();
+const handleSubmit = () => {
+    const data = {
+        eventType: eventType.value,
+        eventName: eventName.value,
+        eventLocation: eventLocation.value,
+        startTime: startTime.value,
+        endTime: endTime.value,
+        minAttendees: minAttendees.value,
+        invitedAttendees: invitedAttendees.value, // t1
+        roundtableId: roundtableId.value, // t2
+        selectedPreferences: selectedPreferences.value, // t3, t4
     };
 
-    onMounted(() => {
-        document.addEventListener('click', handleClickOutside);
-    });
+    let response = await axios.post(
+      import.meta.env.VITE_NODE_API_HOST + '/api/post_event', data,
+      {
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+    console.log(response.data);
+    toggleModal();
+};
 
-    onUnmounted(() => {
-        document.removeEventListener('click', handleClickOutside);
-    });
+const togglePreference = (preference) => {
+    const index = selectedPreferences.value.indexOf(preference);
+    if (index === -1) {
+        selectedPreferences.value.push(preference);
+    } else {
+        selectedPreferences.value.splice(index, 1);
+    }
+};
+
+const fetchPreferences = async () => {
+  try {
+    let id = localStorage.getItem('user');
+    let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences');
+    preferences.value = JSON.parse(response.data).map(item => item.Tag);
+
+  } catch (error) {
+    console.error('Error fetching preferences:', error);
+  }
+};
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+    fetchPreferences();
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <template>
@@ -80,15 +118,13 @@
                 <p><font-awesome-icon icon="fa-solid fa-angle-down" /></p>
                 </div>
 
-            <div class="dropdown-list" v-if="isDropdownOpen">
-                <ul>
-                    <li>
-                        <a href="/settings">
-                            Настройки
-                        </a>
-                    </li>
-                    <li @click="handleClickExit">
-                        <a href="/exit">Выход</a>
+                <div class="dropdown-list" v-if="isDropdownOpen">
+                    <ul>
+                        <li>
+                            <a href="/settings">Настройки</a>
+                        </li>
+                        <li @click="handleClickExit">
+                            <a href="/exit">Выход</a>
                         </li>
                     </ul>
                 </div>
@@ -98,39 +134,62 @@
 
     <Modal :isVisible="isModalOpen" title="Создать мероприятие" @close="toggleModal">
         <form @submit.prevent="handleSubmit" class="create-event-modal">
-            <label for="event-type">Тип ивента:
+            <label for="event-type">Тип мероприятия:
                 <select v-model="eventType" id="event-type" required>
-                    <option value="t1">Т1</option>
-                    <option value="t2">Т2</option>
-                    <option value="t3">Т3</option>
-                    <option value="t4">Т4</option>
+                    <option value="t1">Индивидуальная встреча</option>
+                    <option value="t2">Собрание круглого стола</option>
+                    <option value="t3">Отраслевое мероприятие</option>
+                    <option value="t4">Публичное мероприятие</option>
                 </select>
             </label>
-            
 
             <label for="event-name">Название:
                 <input type="text" v-model="eventName" id="event-name" required />
             </label>
-            
 
             <label for="event-location">Место:
                 <input type="text" v-model="eventLocation" id="event-location" required />
             </label>
-            
 
             <label for="start-time">Время начала:
                 <input type="datetime-local" v-model="startTime" id="start-time" required />
             </label>
-            
 
             <label for="end-time">Время конца:
                 <input type="datetime-local" v-model="endTime" id="end-time" />
             </label>
-            
 
-            <label for="min-attendees">Мин. кол-во посещаемых:
+            <label for="min-attendees" v-if="!(eventType === 't1')">Мин. кол-во посещаемых:
                 <input type="number" v-model="minAttendees" id="min-attendees" min="5" />
             </label>
+
+            <label for="invited-attendees" v-if="eventType === 't1'">Приглашенные (email):
+                <input type="text" v-model="invitedAttendees" id="invited-attendees" placeholder="email1@example.com, email2@example.com" />
+            </label>
+
+
+            <label v-if="eventType === 't2'" for="roundtable-id">Круглый стол (ID):
+                <select v-model="roundtableId" id="roundtable-id">
+                    <option v-for="n in 6" :key="n" :value="n">{{ n }}</option>
+                </select>
+            </label>
+
+            <div v-if="eventType === 't3' || eventType === 't4'">
+                <h3>Предпочтения:</h3>
+                <div class="preferences-wrap">
+                    <div class="preferences">
+                        <toggleButton 
+                            v-for="(preference, index) in preferences" 
+                            :key="index" 
+                            :label="preference"
+                            @toggle="togglePreference(preference)"
+                            :active="selectedPreferences.includes(preference)"
+                            class="pref-button"
+                            type="button"
+                        />
+                    </div>
+                </div>
+            </div>
 
             <button type="submit" id="modal-btn">Создать</button>
         </form>
@@ -229,6 +288,7 @@
     }
 
     .create-event-modal{
+        width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -268,5 +328,50 @@
         padding: 10px 18px;
         background-color: #15263f;
     }
+    .preferences {
+        margin-top: 15px;
+        position: relative; 
+        max-height: 150px;
+        overflow-y: auto; 
+        padding: 15px;
+        border-radius: 8px;
+        scrollbar-width: thin;
+        scrollbar-color: #15263f2f transparent;
+    }
+    .preferences:hover {
+        scrollbar-color: #0f1c2fb9 transparent;
+    }
+
+    .preferences-wrap {
+        position: relative;
+        max-height: 150px;
+    }
+    .preferences-wrap::before,
+    .preferences-wrap::after {
+        z-index: 2;
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 12px;
+        pointer-events: none;
+    }
+
+    /* Top gradient */
+    .preferences-wrap::before {
+        top: 0;
+        background: linear-gradient(to bottom, rgb(255, 255, 255), rgba(255, 255, 255, 0));
+    }
+
+    /* Bottom gradient */
+    .preferences-wrap::after {
+        bottom: 0;
+        background: linear-gradient(to top, rgb(252, 252, 252), rgba(255, 255, 255, 0));
+    }
+    .pref-button {
+        margin: 5px;
+        vertical-align: middle;
+    }
+
 
 </style>

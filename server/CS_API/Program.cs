@@ -143,6 +143,14 @@ namespace MyApi
                 return Results.Ok(result);
             });
 
+            app.MapPost("/api/post_event", async (HttpRequest request, EventService eventService) =>
+            {
+                using var reader = new StreamReader(request.Body);
+                var jsonString = await reader.ReadToEndAsync();
+                var result = await eventService.AddEventAsyncJSON(jsonString);
+                return Results.Ok(result);
+            });
+
             app.Run("http://localhost:5258");
         }
     }
