@@ -4,22 +4,25 @@ using System.Runtime.InteropServices.Marshalling;
 
 namespace MyApi.Models
 {
-    public class Venues
+    public class Venue
     {
         [BsonId]
         public ObjectId Id { get; set; }
 
+        [BsonElement("city")]
+        public string? City { get; private set; }
+
         [BsonElement("address")]
         public string? Address { get; private set; }
 
-        [BsonElement("venuename")]
-        public string? VenueName { get; set; }
+        [BsonElement("name")]
+        public string? Name { get; set; }
 
         [BsonElement("capacity")]
         public int? Capacity { get; set; }
 
         [BsonElement("eventIDs")]
-        public List<ObjectId>? eventIDs { get; set; } 
+        public List<string>? EventIDs { get; set; } 
 
     }
 }

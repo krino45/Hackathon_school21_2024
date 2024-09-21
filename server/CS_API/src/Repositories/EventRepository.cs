@@ -55,7 +55,7 @@ namespace MyApi.Repositories
 
         public async Task<BaseEvent?> GetEventByIdAsync(ObjectId id)
         {
-            var filter = Builders<BaseEvent>.Filter.Eq(e => e.Uid, id);
+            var filter = Builders<BaseEvent>.Filter.Eq(e => e.Id, id);
             return await _eventListCollection.Find(filter).FirstOrDefaultAsync();
         }
 
@@ -68,17 +68,27 @@ namespace MyApi.Repositories
             return await _eventListCollection.Find(filter).ToListAsync();
         }
 
-        public async Task<List<BaseEvent>?> GetEventsByVenueAsync(Venues venue)
-        {
-            var filter = Builders<BaseEvent>.Filter.Eq(e => e.Venue, venue);
-            return await _eventListCollection.Find(filter).ToListAsync();
-        }
-        public async Task<List<BaseEvent>?> GetEventsByVenueAsync(string venueName, string address)
+        public async Task<List<BaseEvent>?> GetEventsByVenueAsync(string venueName, string address, string city)
         {
             var filter = Builders<BaseEvent>.Filter.And(
-                Builders<BaseEvent>.Filter.Eq(e => e.Venue.VenueName, venueName),
-                Builders<BaseEvent>.Filter.Eq(e => e.Venue.Address, address)
+                Builders<BaseEvent>.Filter.Eq(e => e.Venue.Name, venueName),
+                Builders<BaseEvent>.Filter.Eq(e => e.Venue.Address, address),
+                Builders<BaseEvent>.Filter.Eq(e => e.Venue.City, city)
                 );
+            return await _eventListCollection.Find(filter).ToListAsync();
+        }
+        public async Task<List<BaseEvent>?> GetEventsByVenueAsync(Venue venue)
+        {
+            var venueEvents = venue.EventIDs;
+            if (venueEvents == null || !venueEvents.Any())
+                return null;
+            List<ObjectId> eventIDs = new List<ObjectId>();
+            foreach(var venueEvent in venueEvents)
+            {
+                eventIDs.Add(new ObjectId(venueEvent));
+            }
+             
+            var filter = Builders<BaseEvent>.Filter.In(e => e.Id, eventIDs);
             return await _eventListCollection.Find(filter).ToListAsync();
         }
         public async Task<List<BaseEvent>?> GetEventsByNameAsync(string eventName)

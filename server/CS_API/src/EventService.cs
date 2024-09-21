@@ -80,13 +80,13 @@ namespace MyApi
             return JsonConvert.SerializeObject(await _event_repo.GetEventsByTimeRangeAsync(DateTime.Parse(start), DateTime.Parse(end)));
         }
 
-        public async Task<string?> GetEventsByVenueAsyncJSON(Venues venue)
+        public async Task<string?> GetEventsByVenueAsyncJSON(Venue venue)
         {
             return JsonConvert.SerializeObject(await _event_repo.GetEventsByVenueAsync(venue));
         }
-        public async Task<string?> GetEventsByVenueAsyncJSON(string venueName, string address)
+        public async Task<string?> GetEventsByVenueAsyncJSON(string venueName, string address, string city)
         {
-            return JsonConvert.SerializeObject(await _event_repo.GetEventsByVenueAsync(venueName, address));
+            return JsonConvert.SerializeObject(await _event_repo.GetEventsByVenueAsync(venueName, address, city));
         }
         public async Task<string?> GetEventsByNameAsyncJSON(string eventName)
         {
