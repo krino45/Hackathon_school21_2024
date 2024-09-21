@@ -5,10 +5,12 @@
 <template>
     <HeaderCustom />  
 
-    
+    <div class="all-events">
+
+    </div>
 
 </template>
 
 <style scoped>
-
+    
 </style>
