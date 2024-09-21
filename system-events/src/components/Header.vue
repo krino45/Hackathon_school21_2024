@@ -14,6 +14,10 @@
         }
     };
 
+    const handleClickExit = () => {
+        localStorage.removeItem('user');
+    }
+
     onMounted(() => {
         document.addEventListener('click', handleClickOutside);
     });
@@ -45,7 +49,7 @@
                             Настройки
                         </a>
                     </li>
-                    <li>
+                    <li @click="handleClickExit">
                         <a href="/exit">Выход</a>
                     </li>
                 </ul>

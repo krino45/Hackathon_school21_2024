@@ -18,15 +18,12 @@ const newPasswordVisible = ref(false);
 // Загрузка данных при монтировании компонента
 onMounted(() => {
   fetchPreferences();
-  localStorage.setItem('user', JSON.stringify({ id: "66eeaf39622b7f199d5def83" }));
 });
 
 // Функция для получения предпочтений
 const fetchPreferences = async () => {
   try {
-    const userData = localStorage.getItem('user');
-    const user = JSON.parse(userData);
-    let id = user.id;
+    let id = localStorage.getItem('user');
     let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences');
     preferences.value = JSON.parse(response.data).map(item => item.Tag);
 
@@ -34,8 +31,9 @@ const fetchPreferences = async () => {
       params: { userJsonId: JSON.stringify({ userId: id }) },
     });
     let dbUser = JSON.parse(response.data).User;
-    email.value = dbUser.Email;
+    console.info(dbUser);
     selectedPreferences.value = dbUser.Preferences;
+    email.value = dbUser.Email;
 
   } catch (error) {
     console.error('Error fetching preferences:', error);
@@ -45,13 +43,12 @@ const fetchPreferences = async () => {
 // Функция для сохранения изменений
 const saveChanges = async () => {
   try {
-    const userData = localStorage.getItem('user');
-    const user = JSON.parse(userData);
+    const id = localStorage.getItem('user');
     let response = await axios.post(
       import.meta.env.VITE_NODE_API_HOST + '/api/post_user_email', 
       {
-          userId: user.id,
-          newEmail: this.email,
+          userId: id,
+          newEmail: email.value,
       },
       {
           headers: {
@@ -62,9 +59,9 @@ const saveChanges = async () => {
   response = await axios.post(
       import.meta.env.VITE_NODE_API_HOST + '/api/post_user_password', 
       {
-          userId: user.id,
-          currentPassword: this.oldPassword,
-          newPassword: this.newPassword,
+          userId: id,
+          currentPassword: oldPassword.value,
+          newPassword: newPassword.value,
       },
       {
           headers: {
@@ -75,8 +72,8 @@ const saveChanges = async () => {
   response = await axios.post(
     import.meta.env.VITE_NODE_API_HOST + '/api/post_user_preferences', 
     {
-        userId: user.id,
-        preferences: this.selectedPreferences,
+        userId: id,
+        preferences: selectedPreferences.value,
     },
     {
         headers: {

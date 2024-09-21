@@ -71,7 +71,7 @@ namespace MyApi
                 if (newUser.PasswordHash == null)
                     return JsonConvert.SerializeObject(new { success = false, Message = "Enter password!" });
                 newUser.SetPassword(newUser.PasswordHash);
-
+                newUser.Preferences = [];
                 await _user_repo.AddUserAsync(newUser);
                 return JsonConvert.SerializeObject(new { Success = true, Message = "User registered successfully." });
             }
@@ -147,7 +147,20 @@ namespace MyApi
             }
             catch (JsonException ex)
             {
-                return JsonConvert.SerializeObject(new { Success = false, Message = "Invalid JSON format.", Error = ex.Message });
+                System.Console.WriteLine(ex.Message);
+                if (string.IsNullOrEmpty(json))
+                {
+                    return JsonConvert.SerializeObject(new { Success = false, Message = "Email is required." });
+                }
+
+                var user = await _user_repo.GetUserByEmailAsync(json);
+
+                if (user == null)
+                {
+                    return JsonConvert.SerializeObject(new { Success = false, Message = "User not found." });
+                }
+
+                return JsonConvert.SerializeObject(new { Success = true, User = user });
             }
             catch (Exception ex)
             {
@@ -159,20 +172,23 @@ namespace MyApi
         {
             try
             {
-                //System.Console.WriteLine("T1");
+                System.Console.WriteLine("T1");
                 var jsonObj = JObject.Parse(json);
-                //System.Console.WriteLine("T2");
-                var email = jsonObj["login"].ToString();
-                //System.Console.WriteLine("T3");
+                System.Console.WriteLine("T2");
+                var email = jsonObj["login"];
+                System.Console.WriteLine("T3");
                 if (email ==  null)
                 {
-                    email = jsonObj["email"].ToString();
+                    email = jsonObj["email"];
+                    System.Console.WriteLine("HEEEEEEEERE: email" + email);
                     if (email == null)
                     {
                         return JsonConvert.SerializeObject(new { Success = false, Message = "Email or login is required." });
                     }
                 }
-                return email;
+                System.Console.WriteLine("HEEEEEE2222EERE: email" + email);
+
+                return email.ToString();
             }
             catch (Exception ex)
             {

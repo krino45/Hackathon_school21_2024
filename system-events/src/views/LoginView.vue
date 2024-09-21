@@ -131,10 +131,6 @@ const handleRegistration = async () => {
                         <input type="text" v-model="MiddleName" required>
                     </div>
                     <div class="field-form">
-                        <label for="">Отчество</label>
-                        <input type="text" required>
-                    </div>
-                    <div class="field-form">
                         <label for="">Почта</label>
                         <input type="email" v-model="email" required>
                     </div>

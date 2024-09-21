@@ -61,7 +61,7 @@ namespace MyApi
                     context.Request.Body.Position = 0;
                 }
                 await Console.Out.WriteLineAsync("hi3");
-
+                await Console.Out.WriteLineAsync(registerRequest);
 
                 var result = await userService.RegisterUserAsyncJSON(registerRequest);
                 await Console.Out.WriteLineAsync(result);
@@ -113,6 +113,7 @@ namespace MyApi
                 using var reader = new StreamReader(request.Body);
                 var jsonString = await reader.ReadToEndAsync();
                 var result = await userService.UpdateUserEmailAsyncJSON(jsonString);
+                Console.WriteLine(jsonString);
                 return Results.Ok(result);
             });
 
@@ -122,6 +123,7 @@ namespace MyApi
                 var jsonString = await reader.ReadToEndAsync();
                 Console.WriteLine(jsonString);
                 var result = await userService.ChangePasswordAsyncJSON(jsonString);
+                Console.WriteLine("CHANGE PASSWORD: " + result);
                 return Results.Ok(result);
             });
 
