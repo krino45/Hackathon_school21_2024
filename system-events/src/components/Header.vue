@@ -10,7 +10,8 @@ const isDropdownOpen = ref(false);
 const isModalOpen = ref(false);
 const eventType = ref('t1'); // Set default as t1
 const eventName = ref('');
-const eventLocation = ref('');
+const eventLocation = ref(''); // Holds the selected location
+const venues = ref([]); // Stores the list of venues fetched from the API
 const startTime = ref('');
 const endTime = ref('');
 const minAttendees = ref('');
@@ -46,7 +47,6 @@ const handleClickExit = () => {
 };
 
 const handleSubmit = async () => {
-
     let data = {
         eventType: eventType.value,
         Name: eventName.value,
@@ -67,18 +67,27 @@ const handleSubmit = async () => {
     invitedAttendees.value.push(localStorage.getItem('user'));
     data.AttendeesId = invitedAttendees.value.slice().reverse(); 
 
-
     let response = await axios.post(
-      import.meta.env.VITE_NODE_API_HOST + '/api/post_event',
-      data,
-      {
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      }
+        import.meta.env.VITE_NODE_API_HOST + '/api/post_event',
+        data,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
     );
     console.log(response.data);
     toggleModal();
+};
+
+// Fetch venues from the API
+const fetchVenues = async () => {
+    try {
+        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_all_venues_strings');
+        venues.value = response.data; // Assuming the response is an array of venue names
+    } catch (error) {
+        console.error('Error fetching venues:', error);
+    }
 };
 
 const togglePreference = (preference) => {
@@ -91,16 +100,17 @@ const togglePreference = (preference) => {
 };
 
 const fetchPreferences = async () => {
-  try {
-    let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences');
-    preferences.value = JSON.parse(response.data).map(item => item.Tag);
-  } catch (error) {
-    console.error('Error fetching preferences:', error);
-  }
+    try {
+        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences');
+        preferences.value = JSON.parse(response.data).map(item => item.Tag);
+    } catch (error) {
+        console.error('Error fetching preferences:', error);
+    }
 };
 
 onMounted(() => {
     document.addEventListener('click', handleClickOutside);
+    fetchVenues(); // Fetch venues when component is mounted
     fetchPreferences();
 });
 
@@ -160,7 +170,12 @@ onUnmounted(() => {
             </label>
 
             <label for="event-location">Место:
-                <input type="text" v-model="eventLocation" id="event-location" required />
+                <select v-model="eventLocation" id="event-location" required>
+                    <option value="" disabled>Выберите место</option>
+                    <option v-for="venue in venues" :key="venue" :value="venue">
+                        {{ venue }}
+                    </option>
+                </select>
             </label>
 
             <label for="start-time">Время начала:
@@ -178,7 +193,6 @@ onUnmounted(() => {
             <label for="invited-attendees" v-if="eventType === 't1'">Приглашенные (email):
                 <input type="text" v-model="invitedAttendeesInput" id="invited-attendees" placeholder="email1@example.com, email2@example.com" />
             </label>
-
 
             <label v-if="eventType === 't2'" for="roundtable-id">Круглый стол (ID):
                 <select v-model="roundtableId" id="roundtable-id">

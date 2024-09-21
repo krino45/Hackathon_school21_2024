@@ -24,5 +24,10 @@ namespace MyApi.Models
         [BsonElement("eventIDs")]
         public List<string>? EventIDs { get; set; } 
 
+        public override string ToString()
+        {
+            return "г. " + this.City + ", " + this.Address + " (" + this.Name + ")";
+        }
+
     }
 }

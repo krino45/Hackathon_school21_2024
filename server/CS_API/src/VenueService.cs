@@ -76,7 +76,7 @@ namespace MyApi.Services
             try
             {
                 var venues = await _venueRepo.GetAllVenuesAsync();
-                return JsonConvert.SerializeObject(new { Success = true, Venues = venues });
+                return JsonConvert.SerializeObject(new { Success = true, data = venues });
             }
             catch (Exception ex)
             {
@@ -84,7 +84,26 @@ namespace MyApi.Services
             }
         }
 
-        public async Task<string> UpdateVenueAsyncJSON(string json)
+        public async Task<List<string>?> GetAllVenuesAsync_StringsJSON()
+        {
+            try
+            {
+                var venues = await _venueRepo.GetAllVenuesAsync();
+                List<string> strings = new List<string>();
+                foreach (Venue venue in venues)
+                {
+                    await Console.Out.WriteLineAsync(venue.ToString());
+                    strings.Add(venue.ToString());
+                }
+                return strings;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+            public async Task<string> UpdateVenueAsyncJSON(string json)
         {
             try
             {

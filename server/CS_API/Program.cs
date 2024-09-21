@@ -50,6 +50,22 @@ namespace MyApi
                 return Results.Ok(jsonResult);
             });
 
+            app.MapGet("/api/get_all_venues", async (VenueService venueService) =>
+            {
+                await Console.Out.WriteLineAsync("api/get_all_venues");
+                var jsonResult = await venueService.GetAllVenuesAsyncJSON();
+                Console.WriteLine(jsonResult);
+                return Results.Ok(jsonResult);
+            });
+
+            app.MapGet("/api/get_all_venues_strings", async (VenueService venueService) =>
+            {
+                await Console.Out.WriteLineAsync("api/get_all_venues_strings");
+                var not_jsonResult = await venueService.GetAllVenuesAsync_StringsJSON();
+                Console.WriteLine(not_jsonResult);
+                return Results.Ok(not_jsonResult);
+            });
+
             app.MapPost("/register", async (HttpContext context) =>
             {
                 await Console.Out.WriteLineAsync("hi1");
