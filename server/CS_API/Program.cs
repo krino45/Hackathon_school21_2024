@@ -61,8 +61,9 @@ namespace MyApi
                 var result = await userService.RegisterUserAsyncJSON(registerRequest);
                 await Console.Out.WriteLineAsync(result);
                 await Console.Out.WriteLineAsync("hi4");
-
-                var userjson = await userService.GetUserByEmailAsyncJSON(await userService.GetEmailAsyncJSON(registerRequest));
+                var email = await userService.GetEmailAsyncJSON(registerRequest);
+                await Console.Out.WriteLineAsync("email: " + email);
+                var userjson = await userService.GetUserByEmailAsyncJSON(email);
                 await Console.Out.WriteLineAsync("userjson: " + userjson);
                 await Console.Out.WriteLineAsync("message: " + userService.GetUserIDAsyncJSON(userjson));
                 return Results.Ok(new { message = userService.GetUserIDAsyncJSON(userjson) });
@@ -87,14 +88,14 @@ namespace MyApi
                 }
                 var result = await userService.ValidateLoginAsyncJSON(loginRequest);
 
-                if (result)
-                {
-                    var userjson = await userService.GetUserByEmailAsyncJSON(await userService.GetEmailAsyncJSON(loginRequest));
-                    await Console.Out.WriteLineAsync("email: " + await userService.GetEmailAsyncJSON(loginRequest));
-                    await Console.Out.WriteLineAsync("json: " + loginRequest);
-                    await Console.Out.WriteLineAsync("userjson: " + userjson);
-                    await Console.Out.WriteLineAsync("message: " + userService.GetUserIDAsyncJSON(userjson));
-                    return Results.Ok(new { message = userService.GetUserIDAsyncJSON(userjson) });
+            if (result)
+            {
+                var email = await userService.GetEmailAsyncJSON(loginRequest);
+                await Console.Out.WriteLineAsync("email: " + "{\"email\": \"" + email + "\"}");
+                var userjson = await userService.GetUserByEmailAsyncJSON("{\"email\": \"" + email + "\"}");
+                await Console.Out.WriteLineAsync("userjson: " + userjson);
+                await Console.Out.WriteLineAsync("message: " + userService.GetUserIDAsyncJSON(userjson));
+                return Results.Ok(new { message = userService.GetUserIDAsyncJSON(userjson) });
                 }
                 else
                 {

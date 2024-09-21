@@ -122,6 +122,14 @@ namespace MyApi
             {
                 var jsonObj = JObject.Parse(json);
                 var email = jsonObj["email"]?.ToString();
+                if (email == null)
+                {
+                    email = jsonObj["login"]?.ToString();
+                    if (email == null)
+                    {
+                        return JsonConvert.SerializeObject(new { Success = false, Message = "Email or login is required." });
+                    }
+                }
 
                 if (string.IsNullOrEmpty(email))
                 {
@@ -151,10 +159,20 @@ namespace MyApi
         {
             try
             {
+                //System.Console.WriteLine("T1");
                 var jsonObj = JObject.Parse(json);
-                if (jsonObj["login"] ==  null)
-                    return jsonObj["email"]!.ToString();
-                return jsonObj["login"]!.ToString();
+                //System.Console.WriteLine("T2");
+                var email = jsonObj["login"].ToString();
+                //System.Console.WriteLine("T3");
+                if (email ==  null)
+                {
+                    email = jsonObj["email"].ToString();
+                    if (email == null)
+                    {
+                        return JsonConvert.SerializeObject(new { Success = false, Message = "Email or login is required." });
+                    }
+                }
+                return email;
             }
             catch (Exception ex)
             {
@@ -163,16 +181,18 @@ namespace MyApi
             }
         }
 
-        public async Task<string?> GetUserIDAsyncJSON(string json)
+        public string GetUserIDAsyncJSON(string json)
         {
             try
             {
                 var jsonObj = JObject.Parse(json);
-                return jsonObj["id"]?.ToString();
+                //System.Console.WriteLine("json for id: " + jsonObj);
+                System.Console.WriteLine("Id: " + jsonObj["User"]?["Id"]?.ToString());
+                return jsonObj["User"]?["Id"]?.ToString();
             }
             catch (Exception ex)
             {
-                await Console.Out.WriteLineAsync(ex.Message);
+                Console.WriteLine(ex.Message);
                 return null;
             }
         }
@@ -309,7 +329,7 @@ namespace MyApi
                     return JsonConvert.SerializeObject(new { Success = false, Message = "User not found." });
                 }
 
-                var newPreferences = preferencesArray.ToObject<List<PreferenceTag>>();
+                var newPreferences = preferencesArray.ToObject<List<string>>();
 
                 user.Preferences = newPreferences;
 
