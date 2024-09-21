@@ -17,8 +17,9 @@ using MongoDB.Driver;
             var app = builder.Build();
                 app.UseCors(policy => policy
                 .AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod());
+                // .AllowAnyHeader()
+                // .AllowAnyMethod()
+                );
 
                 app.MapGet("/api/preferences", async (TagService tagService) =>
                 {
