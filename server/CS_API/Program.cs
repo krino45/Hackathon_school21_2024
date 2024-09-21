@@ -13,6 +13,7 @@ using MongoDB.Driver;
                 builder.Services.AddCors();
                 builder.Services.AddSingleton<IMongoClient>(s => new MongoClient(Environment.GetEnvironmentVariable("MONGODB_URI")));
                 builder.Services.AddScoped<TagService>();
+                builder.Services.AddScoped<EventService>();
 
             var app = builder.Build();
                 app.UseCors(policy => policy
@@ -23,6 +24,13 @@ using MongoDB.Driver;
                     var jsonResult = await tagService.GetTagCollectionJSON();
                     return Results.Ok(jsonResult);
                 });
+
+                app.MapGet("/api/get_all_events", async (EventService eventService) =>
+                {
+                    var jsonResult = await eventService.GetAllEventsAsyncJSON();
+                    return Results.Ok(jsonResult);
+                });
+
 
 
             app.Run("http://localhost:5258");
