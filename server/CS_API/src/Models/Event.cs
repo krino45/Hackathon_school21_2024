@@ -14,7 +14,7 @@ namespace MyApi.Models
     }
     public class IndustryEvent : BaseEvent
     {
-        public List<PreferenceTag>? tags { get; set; }
+        public List<string>? tags { get; set; }
     }
     public class PublicEvent : BaseEvent
     {

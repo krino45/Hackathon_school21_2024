@@ -14,7 +14,8 @@ const eventLocation = ref('');
 const startTime = ref('');
 const endTime = ref('');
 const minAttendees = ref('');
-const invitedAttendees = ref(''); // For t1 emails
+const invitedAttendeesInput = ref(''); // Now it's a string input
+const invitedAttendees = ref([]); // Will hold the array of emails
 const roundtableId = ref('1'); // For t2 combobox
 const preferences = ref([]); // For t3 and t4 preferences
 const selectedPreferences = ref([]);
@@ -45,25 +46,37 @@ const handleClickExit = () => {
 };
 
 const handleSubmit = async () => {
-    const data = {
+
+    let data = {
         eventType: eventType.value,
-        eventName: eventName.value,
-        eventLocation: eventLocation.value,
+        Name: eventName.value,
+        venue: eventLocation.value,
         startTime: startTime.value,
         endTime: endTime.value,
         minAttendees: minAttendees.value,
-        invitedAttendees: invitedAttendees.value, // t1
+        AttendeesId: invitedAttendees.value,
         roundtableId: roundtableId.value, // t2
-        selectedPreferences: selectedPreferences.value, // t3, t4
+        tags: selectedPreferences.value, // t3, t4
     };
 
+    invitedAttendees.value = invitedAttendeesInput.value
+        .split(',')
+        .map(email => email.trim())
+        .filter(email => email !== '');
+
+    invitedAttendees.value.push(localStorage.getItem('user'));
+    data.AttendeesId = invitedAttendees.value.slice().reverse(); 
+
+
     let response = await axios.post(
-      import.meta.env.VITE_NODE_API_HOST + '/api/post_event', data,
+      import.meta.env.VITE_NODE_API_HOST + '/api/post_event',
+      data,
       {
           headers: {
               'Content-Type': 'application/json',
           },
-      });
+      }
+    );
     console.log(response.data);
     toggleModal();
 };
@@ -79,10 +92,8 @@ const togglePreference = (preference) => {
 
 const fetchPreferences = async () => {
   try {
-    let id = localStorage.getItem('user');
     let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences');
     preferences.value = JSON.parse(response.data).map(item => item.Tag);
-
   } catch (error) {
     console.error('Error fetching preferences:', error);
   }
@@ -97,6 +108,7 @@ onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside);
 });
 </script>
+
 
 <template>
     <header>
@@ -164,7 +176,7 @@ onUnmounted(() => {
             </label>
 
             <label for="invited-attendees" v-if="eventType === 't1'">Приглашенные (email):
-                <input type="text" v-model="invitedAttendees" id="invited-attendees" placeholder="email1@example.com, email2@example.com" />
+                <input type="text" v-model="invitedAttendeesInput" id="invited-attendees" placeholder="email1@example.com, email2@example.com" />
             </label>
 
 

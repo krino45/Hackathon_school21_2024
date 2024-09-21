@@ -54,6 +54,7 @@ namespace MyApi
                     default:
                         throw new ArgumentException("Invalid eventType specified.");
                 }
+                
                 await _event_repo.AddEventAsync(newEvent);
                 return JsonConvert.SerializeObject(new { Success = true, Message = "Event added." });
             }
