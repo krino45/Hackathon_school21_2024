@@ -1,0 +1,10 @@
+{
+  "Mailing": {
+    "SmtpServer": "smtp.yandex.ru",
+    "SmtpPort": 587,
+    "SenderEmail": "pavlova.v.pav@yandex.ru", 
+    "MailingLogin": "pavlova.v.pav",
+    "MailingPassword": "fyvaabzevvpnufmm",
+    "Subject": "Уведомление о предстоящем мероприятии!"
+  }
+}
