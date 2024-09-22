@@ -77,7 +77,7 @@ const handleSubmit = async () => {
         }
     );
     console.log(response.data);
-    toggleModal();
+    location.reload();
 };
 
 const fetchVenues = async () => {
@@ -130,7 +130,7 @@ onUnmounted(() => {
         <div class="control-panel">
             <div class="controls" v-if="showControls">
                 <Button label="Создать" class="btn-controls" @click="toggleModal" />
-                <Button label="Мои мероприятия" class="btn-controls" />
+                <Button label="Мои мероприятия" class="btn-controls" @click="() => $router.push('/calendar')"/>
             </div>
 
             <div class="panel-nav">
@@ -216,7 +216,7 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <button type="submit" id="modal-btn">Создать</button>
+            <button type="submit" id="modal-btn" >Создать</button>
         </form>
     </Modal>
 </template>
