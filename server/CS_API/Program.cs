@@ -137,7 +137,6 @@ namespace MyApi
                 using var reader = new StreamReader(request.Body);
                 var jsonString = await reader.ReadToEndAsync();
                 var result = await userService.UpdateUserEmailAsyncJSON(jsonString);
-                Console.WriteLine(jsonString);
                 return Results.Ok(result);
             });
 

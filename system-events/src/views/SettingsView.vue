@@ -12,22 +12,17 @@ const checkUserId = async () => {
         });
         console.log(response.data);
 
-        if (!JSON.parse(response.data).Success)
-        {
+        if (!JSON.parse(response.data).Success) {
             userId.value = null;
             localStorage.removeItem('user');
             window.location.href = "/login";
         }
-
-  }
-  else
-    {
+    } else {
         window.location.href = "/login";
     }
 };
 
-
-// Работа с данными через `ref`, более удобный подход для Composition API
+// Работа с данными через `ref`
 const preferences = ref([]);
 const selectedPreferences = ref([]);
 const email = ref('');
@@ -37,94 +32,108 @@ const editEmail = ref(false);
 const editPassword = ref(false);
 const oldPasswordVisible = ref(false);
 const newPasswordVisible = ref(false);
+const message = ref('');
+const messageColor = ref('');
 
 onBeforeMount(async () => {
-  console.log('Component mounted');
-  checkUserId();
+    console.log('Component mounted');
+    checkUserId();
 });
+
 // Загрузка данных при монтировании компонента
 onMounted(async () => {
-  fetchPreferences();
+    fetchPreferences();
 });
 
 // Функция для получения предпочтений
 const fetchPreferences = async () => {
-  try {
-    let id = localStorage.getItem('user');
-    let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences');
-    preferences.value = JSON.parse(response.data).map(item => item.Tag);
+    try {
+        let id = localStorage.getItem('user');
+        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user_preferences');
+        preferences.value = JSON.parse(response.data).map(item => item.Tag);
 
-    response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user", {
-      params: { userJsonId: JSON.stringify({ userId: id }) },
-    });
-    let dbUser = JSON.parse(response.data).User;
-    console.info(dbUser);
-    selectedPreferences.value = dbUser.Preferences;
-    email.value = dbUser.Email;
+        response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user", {
+            params: { userJsonId: JSON.stringify({ userId: id }) },
+        });
+        let dbUser = JSON.parse(response.data).User;
+        console.info(dbUser);
+        selectedPreferences.value = dbUser.Preferences;
+        email.value = dbUser.Email;
 
-  } catch (error) {
-    console.error('Error fetching preferences:', error);
-  }
+    } catch (error) {
+        console.error('Error fetching preferences:', error);
+    }
 };
 
 // Функция для сохранения изменений
 const saveChanges = async () => {
-  try {
-    const id = localStorage.getItem('user');
-    let response = await axios.post(
-      import.meta.env.VITE_NODE_API_HOST + '/api/post_user_email', 
-      {
-          userId: id,
-          newEmail: email.value,
-      },
-      {
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      });
+    try {
+        message.value = '';
+        const id = localStorage.getItem('user');
+        let responseEmail = await axios.post(
+            import.meta.env.VITE_NODE_API_HOST + '/api/post_user_email', 
+            {
+                userId: id,
+                newEmail: email.value,
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-  response = await axios.post(
-      import.meta.env.VITE_NODE_API_HOST + '/api/post_user_password', 
-      {
-          userId: id,
-          currentPassword: oldPassword.value,
-          newPassword: newPassword.value,
-      },
-      {
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      });
+        let responsePassword = await axios.post(
+            import.meta.env.VITE_NODE_API_HOST + '/api/post_user_password', 
+            {
+                userId: id,
+                currentPassword: oldPassword.value,
+                newPassword: newPassword.value,
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-  response = await axios.post(
-    import.meta.env.VITE_NODE_API_HOST + '/api/post_user_preferences', 
-    {
-        userId: id,
-        preferences: selectedPreferences.value,
-    },
-    {
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-  } catch (error) {
-    console.error('There was an error!', error);
-  }
+        let responsePreferences = await axios.post(
+            import.meta.env.VITE_NODE_API_HOST + '/api/post_user_preferences', 
+            {
+                userId: id,
+                preferences: selectedPreferences.value,
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+        // Проверка успешности всех запросов
+        if (responseEmail.status === 200 && responsePassword.status === 200 && responsePreferences.status === 200) {
+            message.value = 'Изменения сохранены успешно!';
+            messageColor.value = 'green';
+        } else {
+            message.value = 'Ошибка при сохранении изменений.';
+            messageColor.value = 'red';
+        }
+    } catch (error) {
+        console.error('There was an error!', error);
+        message.value = 'Произошла ошибка: ' + error.message;
+        messageColor.value = 'red';
+    }
 };
 
 // Функция переключения предпочтений
 const togglePreference = (preference) => {
-  const index = selectedPreferences.value.indexOf(preference);
-  if (index === -1) {
-    selectedPreferences.value.push(preference);
-  } else {
-    selectedPreferences.value.splice(index, 1);
-  }
+    const index = selectedPreferences.value.indexOf(preference);
+    if (index === -1) {
+        selectedPreferences.value.push(preference);
+    } else {
+        selectedPreferences.value.splice(index, 1);
+    }
 };
 </script>
 
 <template>
-
   <HeaderCustom />
 
   <div class="container">
@@ -203,6 +212,11 @@ const togglePreference = (preference) => {
       </section>
 
       <button @click="saveChanges()" class="save-button">Сохранить изменения</button>
+
+      <!-- Сообщение о результате сохранения -->
+      <div v-if="message" :style="{ color: messageColor }" class="result-message">
+        {{ message }}
+      </div>
     </div>
   </div>
 </template>
@@ -341,6 +355,12 @@ input[type="checkbox"] {
   background-color: #f4f4f4;
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.result-message {
+  margin-top: 20px;
+  font-size: 16px;
+  text-align: center;
 }
 
 /* Заголовки */
