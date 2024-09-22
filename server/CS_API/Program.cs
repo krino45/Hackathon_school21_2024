@@ -37,6 +37,12 @@ namespace MyApi
                 return Results.Ok(jsonResult);
             });
 
+            app.MapGet("/api/get_user/safe", async (UserService userService, string userJsonId) =>
+            {
+                var jsonResult = await userService.GetUserByIdAsyncJSON_safe(userJsonId);
+                return Results.Ok(jsonResult);
+            });
+
             app.MapGet("/api/get_user_preferences", async (TagService tagService) =>
             {
                 var jsonResult = await tagService.GetTagCollectionJSON();

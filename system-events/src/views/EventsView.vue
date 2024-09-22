@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, nextTick, computed } from 'vue'; // Добавлен импорт computed
+import { ref, onMounted, nextTick, computed, onBeforeMount } from 'vue'; // Добавлен импорт computed
 import HeaderCustom from '@src/components/Header.vue'
 import ToggleButton from '@src/components/ToggleButton.vue';
 import axios from 'axios';
@@ -93,6 +93,32 @@ const subscribeUser = async (eventId) => {
 
 const displayedPreferences = computed(() => {
   return showAllPreferences.value ? preferences.value : preferences.value.slice(0, 3);
+});
+
+const checkUserId = async () => {
+    const storedUserId = localStorage.getItem('user');
+    if (storedUserId && typeof storedUserId === 'string') {
+        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user/safe", {
+            params: { userJsonId: JSON.stringify({ userId: storedUserId }) },
+        });
+        console.log(response.data);
+
+        if (!JSON.parse(response.data).Success)
+        {
+            userId.value = null;
+            localStorage.setItem('user', null);
+            window.location.href = "/login";
+        }
+
+    }
+    else
+    {
+        window.location.href = "/login";
+    }
+};
+
+onBeforeMount(() => {
+    checkUserId();
 });
 </script>
 

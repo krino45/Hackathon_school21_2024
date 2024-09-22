@@ -1,8 +1,31 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
 import axios from 'axios';
 import ToggleButton from '@src/components/ToggleButton.vue';
 import HeaderCustom from '@src/components/Header.vue';
+
+const checkUserId = async () => {
+    const storedUserId = localStorage.getItem('user');
+    if (storedUserId && typeof storedUserId === 'string') {
+        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user/safe", {
+            params: { userJsonId: JSON.stringify({ userId: storedUserId }) },
+        });
+        console.log(response.data);
+
+        if (!JSON.parse(response.data).Success)
+        {
+            userId.value = null;
+            localStorage.removeItem('user');
+            window.location.href = "/login";
+        }
+
+  }
+  else
+    {
+        window.location.href = "/login";
+    }
+};
+
 
 // Работа с данными через `ref`, более удобный подход для Composition API
 const preferences = ref([]);
@@ -15,6 +38,10 @@ const editPassword = ref(false);
 const oldPasswordVisible = ref(false);
 const newPasswordVisible = ref(false);
 
+onBeforeMount(async () => {
+  console.log('Component mounted');
+  checkUserId();
+});
 // Загрузка данных при монтировании компонента
 onMounted(async () => {
   fetchPreferences();
