@@ -24,12 +24,16 @@ namespace MyApi
             builder.Services.AddScoped<EventService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<VenueService>();
+            builder.Services.AddScoped<MailingService>();
 
             var app = builder.Build();
             app.UseCors(policy => policy
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod());
+
+            MailingService mailingService = new MailingService();
+            mailingService.Start();
 
             app.MapGet("/api/get_user", async (UserService userService, string userJsonId) =>
             {
