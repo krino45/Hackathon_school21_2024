@@ -1,5 +1,5 @@
 <script setup>
-    import Header from '@src/components/Header.vue'
+    import MyHeader from '@src/components/Header.vue'
 </script>
 
 <script>
@@ -16,18 +16,8 @@ export default {
         date: '',
         nextDate: '',
         todayTime: [
-
         ],
         tomorrowTime: [
-
-        ],
-        eventsId: [
-        ],
-        todayEvents: [
-            'Ничего не запланировано'
-        ],
-        tomorrowEvents: [
-            'Ничего не запланировано'
         ],
         weekDays: [
         ' Воскресенье',
@@ -69,10 +59,10 @@ methods:{
     },
     async fetch()
     {
-        this.day = this.getDayOfWeek(this.shift);
-        this.next = this.getDayOfWeek(this.shift + 1);
-        this.date = this.getDay(this.shift);
-        this.nextDate = this.getDay(this.shift + 1);
+        this.day = this.getDayOfWeek(this.shift +6);
+        this.next = this.getDayOfWeek(this.shift);
+        this.date = this.getDay(this.shift - 1);
+        this.nextDate = this.getDay(this.shift);
         let data;
         let events = []
         localStorage.setItem('user', JSON.stringify({userId: "66ed6be90840463b66a487fa", email: "hello13224@yandex.ru", password: "some_password" }));
@@ -82,56 +72,57 @@ methods:{
                 params:{
                     userJsonId: user},})    
                     data = JSON.parse(response.data)
+                    console.log(data)
                     for(let i = 0; i < data.User.Events.length; i++)
                     {
                         events.push(data.User.Events[i])
                     }
         }
         catch(error) {
-            console.error('Error fetching preferences:', error);
+            console.error('Error fetching user:', error);
         }
 
         try{
+            for(let i = 0; i < events.length; i++)
+            {
             let obj = {}
-            obj.id = events[1]
-            console.log(obj)
+            obj.id = events[i]
             const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_event', {
                 params:{
                     json: JSON.stringify(obj)
                 }
             })
-            console.log(this.eventsId[0])
             let data = JSON.parse(response.data)
-            console.log(data)
-            for(let i = 0; i < data.User.Events.length; i++)
-                {
-                    this.eventsId.push(data.User.Events[i])
-                }
+            let day = new Date(data.data.StartTime).getUTCDate()
+            let month = this.months[Number(new Date(data.data.StartTime).getUTCMonth())]
+            let hour = new Date(data.data.StartTime).getUTCHours()
+            let minute = new Date(data.data.StartTime).getUTCMinutes()
+            let end_hour = new Date(data.data.EndTime).getUTCHours()
+            let end_minute = new Date(data.data.EndTime).getUTCMinutes()
 
+            if(day + month == this.date)
+            {
+                this.todayTime[this.todayTime.length] = hour + ':' + minute + ' - ' + end_hour + ':' + end_minute + ' ' + '\"' + data.data.Name + '\" ' + ' площадка:\n' + data.data.Venue
+            }
+            else if (day + month == this.nextDate)
+            {
+                this.tomorrowTime[this.todayTime.length] = hour + ':' + minute + ' - ' + end_hour + ':' + end_minute
+            }
+            }
+            if(this.todayTime.length == 0)
+            {
+                this.todayTime.push('Событий нет')
+            }
+            if(this.tomorrowTime.length == 0)
+            {
+                this.tomorrowTime.push('Событий нет')
+            }
+            this.todayTime.sort()
+            this.tomorrowTime.sort()
         }
         catch(error)
         {
-
-        }
-
-
-        // for(let i = 0; i < events.length; i++)
-        // {
-        //     let time = events[i].start_time.split(' ');
-
-        //     if(time[1] + ' ' + time[0] == this.date)
-        //     {
-        //         this.todayTime.push(time[2] + " - " + events[i].end_time.split(' ')[2])
-        //     }
-        //     else if(time[1] + ' ' + time[0] == this.nextDate)
-        //     {
-        //         this.tomorrowTime.push(time[2] + " - " + events[i].end_time.split(' ')[2])
-        //     }
-        // }
-
-        for(let i = 0; i < this.eventsId.length; i++)
-        {
-            this.todayEvents[i] = this.eventsId[i];
+            console.error('Error fetching event:', error);
         }
 
     },
@@ -145,19 +136,25 @@ methods:{
 </script>
 
 <template>
-    <Header/>
+    <MyHeader/>
     <div class="calendar">
         <div class="date">
-          <p color="#ffdfdf">Сегодня</p>
-          <p>{{ day }} {{ date }}</p>
-          <p v-for="(id, index) in todayTime"> {{ id }}</p>
-          
-        </div>  
+               <p>Сегодня</p>
+                <p>{{ day }} {{ date }}</p>
+                <div class="wrapper">
+                <ul class="table" v-for="(id, index) in todayTime">
+                    {{ id }}
+                </ul>
+                </div>
+        </div>
         <div class="date">
-            <p>Завтра</p>
-            <p>{{ next }} {{ nextDate }}</p>
-            <p v-for="(id, index) in tomorrowTime"> {{ id }}</p>
-
+               <p>завтра</p>
+                <p>{{ next }} {{ nextDate }}</p>
+                <div class="wrapper">
+                <ul class="table" v-for="(id, index) in tomorrowTime">
+                    {{ id }}
+                </ul>
+                </div>
         </div>
     </div>
 </template>
@@ -169,30 +166,50 @@ methods:{
         display: flex;
         position: relative;
         flex-direction: column;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        min-height: 350px;
-        max-height: 600px;
+        justify-content: center;
         margin-top: 7%;
         align-items: center;
         top: 0px;
         width: 80%;
         left: 10%;
     }
-
+    
     .date
     {
-        width: 35%;
-        height:fit-content;
-        min-height: 200px;
-        display: flex;
-        flex-direction: column;
-        background-color: #15263f;
+        padding-top: 1%;
+        padding-bottom: 1%;
+        min-width: 45%;
+        width: auto ;
+        min-height: 150px;
+        display: inline-block;
+        background-color: #68148f;
         color: #fff;
         border-radius: 10%;
         margin-top: 2%;
         text-align: center;
+        justify-self: center;
     }
 
+    .table
+    {
+        display: flex;
+        flex-direction: column;
+        min-width: max-content ;
+        margin-top: 3%;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        background-color: #68148f;
+    }
+    
+    .wrapper
+    {
+        max-width: 90%;
+        display: inline-block;
+        align-items: center;
+        justify-content: center;
+        margin-left: 10%;
+        margin-right: 10%;
+
+    }
 
 </style>
