@@ -46,7 +46,6 @@ namespace MyApi
             app.MapGet("/api/get_all_events", async (EventService eventService) =>
             {
                 var jsonResult = await eventService.GetAllEventsAsyncJSON();
-                Console.WriteLine(jsonResult);
                 return Results.Ok(jsonResult);
             });
 
@@ -142,7 +141,6 @@ namespace MyApi
                 var jsonString = await reader.ReadToEndAsync();
                 Console.WriteLine(jsonString);
                 var result = await userService.ChangePasswordAsyncJSON(jsonString);
-                Console.WriteLine("CHANGE PASSWORD: " + result);
                 return Results.Ok(result);
             });
 
@@ -160,6 +158,16 @@ namespace MyApi
                 var jsonString = await reader.ReadToEndAsync();
                 var result = await eventService.AddEventAsyncJSON(jsonString);
                 return Results.Ok(result);
+            });
+
+            app.MapPost("/api/post_subscribe_user", async (HttpRequest request, EventService eventService, UserService userService) =>
+            {
+                using var reader = new StreamReader(request.Body);
+                var jsonString = await reader.ReadToEndAsync();
+                Console.WriteLine(jsonString);
+                var eventResult = await eventService.AddAttendeeAsyncJSON(jsonString);
+                var userResult = await userService.AddEventAsyncJSON(jsonString);
+                return Results.Ok(eventResult + "\n" + userResult);
             });
 
             app.Run("http://localhost:5258");

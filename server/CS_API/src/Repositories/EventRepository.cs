@@ -48,6 +48,22 @@ namespace MyApi.Repositories
             await _eventListCollection.InsertOneAsync(newEvent);
         }
 
+        public async Task<bool> AddAttendeeAsync(ObjectId eventId, string email)
+        {
+            var eventFilter = Builders<BaseEvent>.Filter.Eq(e => e.Id, eventId);
+            var existingEvent = await _eventListCollection.Find(eventFilter).FirstOrDefaultAsync();
+
+            if (existingEvent == null)
+            {
+                return false;
+            }
+
+            var update = Builders<BaseEvent>.Update.AddToSet(e => e.AttendeesId, email);
+            var result = await _eventListCollection.UpdateOneAsync(eventFilter, update);
+
+            return result.ModifiedCount > 0;
+        }
+
         public async Task<List<BaseEvent>> GetAllEventsAsync()
         {
             return await _eventListCollection.Find(_ => true).ToListAsync();

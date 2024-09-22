@@ -284,7 +284,33 @@ namespace MyApi
             }
         }
 
-    public async Task<string> ChangePasswordAsyncJSON(string json)
+        public async Task<string> AddEventAsyncJSON(string json)
+        {
+            try
+            {
+                var jsonObj = JsonConvert.DeserializeObject<dynamic>(json);
+                if (jsonObj == null)
+                    throw new ArgumentException("Invalid JSON input.");
+
+                string userId = jsonObj.user.Id;
+                Console.WriteLine("C# user" + userId);
+                string eventId = jsonObj.eventId;
+
+                bool isAdd = await _user_repo.AddEventAsync(new ObjectId(userId), new ObjectId(eventId));
+
+                return JsonConvert.SerializeObject(new { Success = isAdd, Message = isAdd ? "Event added successfully." : "User not found." });
+            }
+            catch (JsonException ex)
+            {
+                return JsonConvert.SerializeObject(new { Success = false, Message = "Invalid JSON format.", Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { Success = false, Message = "An error occurred while updating the email.", Error = ex.Message });
+            }
+        }
+
+        public async Task<string> ChangePasswordAsyncJSON(string json)
         {
             try
             {

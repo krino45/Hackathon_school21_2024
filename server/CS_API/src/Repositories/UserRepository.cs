@@ -15,6 +15,30 @@ namespace MyApi.Repositories
             _usersCollection = database.GetCollection<User>("Users");
         }
 
+        public async Task<bool> AddEventAsync(ObjectId userId, ObjectId eventId)
+        {
+            Console.WriteLine("FUNCTION: " + userId);
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var existingUser = await _usersCollection.Find(filter).FirstOrDefaultAsync();
+
+            if (existingUser == null)
+            {
+                Console.WriteLine("return?");
+                return false;
+            }
+
+            if (existingUser.Events == null)
+            {
+                existingUser.Events = new List<ObjectId>();
+            }
+
+            existingUser.Events.Add(eventId);
+            Console.WriteLine("Trying to add: " + eventId);
+            var result = await _usersCollection.ReplaceOneAsync(filter, existingUser);
+
+            return result.ModifiedCount > 0;
+        }
+
         public async Task<bool> ValidateLoginAsync(string email, string password)
         {
             var user = await GetUserByEmailAsync(email);

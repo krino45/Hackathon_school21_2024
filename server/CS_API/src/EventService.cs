@@ -68,8 +68,32 @@ namespace MyApi
             }
         }
 
+        public async Task<string> AddAttendeeAsyncJSON(string json)
+        {
+            try
+            {
+                var jsonObj = JsonConvert.DeserializeObject<dynamic>(json);
+                if (jsonObj == null)
+                    throw new ArgumentException("Invalid JSON input.");
 
-    public async Task<string?> GetAllEventsAsyncJSON()
+                string eventId = jsonObj.eventId;
+                string email = jsonObj.user.Email;
+                Console.WriteLine("C# event" + email);
+
+                await _event_repo.AddAttendeeAsync(new ObjectId(eventId), email);
+                return JsonConvert.SerializeObject(new { Success = true, Message = "User added." });
+            }
+            catch (JsonException ex)
+            {
+                return JsonConvert.SerializeObject(new { Success = false, Message = "Invalid JSON format: " + ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { Success = false, Message = "An error occurred while adding the attendee." + ex.Message });
+            }
+        }
+
+        public async Task<string?> GetAllEventsAsyncJSON()
         {
             return JsonConvert.SerializeObject(await _event_repo.GetAllEventsAsync());
         }
@@ -104,6 +128,8 @@ namespace MyApi
                 return JsonConvert.SerializeObject(new { Success = false, Message = "An error occurred.", Error = ex.Message });
             }
         }
+
+
 
         /*
         public async Task<string?> GetEventsByTimeRangeAsyncJSON(string start, string end)
