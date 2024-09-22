@@ -59,7 +59,12 @@ namespace MyApi
             {
                 await Console.Out.WriteLineAsync("api/get_all_venues");
                 var jsonResult = await venueService.GetAllVenuesAsyncJSON();
-                Console.WriteLine(jsonResult);
+                return Results.Ok(jsonResult);
+            });
+
+            app.MapGet("/api/get_event", async (EventService eventService, string json) =>
+            {
+                var jsonResult = await eventService.GetEventByIdAsyncJSON(json);
                 return Results.Ok(jsonResult);
             });
 
