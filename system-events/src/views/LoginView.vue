@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
+import axios from 'axios';
 
 const isLogin = ref(true);
 const login = ref('');
@@ -42,6 +43,7 @@ const handleLogin = async () => {
         console.log('Login successful:', data);
         responseMessage.value = '';
         localStorage.setItem('user', data.message);
+        window.location.href = "/events";
 
     } catch (error) {
         console.error('Error:', error);
@@ -75,12 +77,37 @@ const handleRegistration = async () => {
         console.log('Registration successful:', data);
         responseMessage.value = '';
         localStorage.setItem('user', data.message);
+        window.location.href = "/events";
 
     } catch (error) {
         console.error('Error:', error);
         responseMessage.value = error.message;
     }
 };
+
+const userId = ref(null);
+const checkUserId = async () => {
+    const storedUserId = localStorage.getItem('user');
+    if (storedUserId && typeof storedUserId === 'string') {
+        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user", {
+            params: { userJsonId: JSON.stringify({ userId: storedUserId }) },
+        });
+        console.log(response.data);
+
+        if (JSON.parse(response.data).Success)
+        {
+            userId.value = storedUserId;
+            console.log("userId: " + userId.value);
+            window.location.href = "/events";
+            console.log(buttonLink);
+        }
+
+    }
+};
+
+onBeforeMount(() => {
+    checkUserId();
+});
 </script>
 
 <template>

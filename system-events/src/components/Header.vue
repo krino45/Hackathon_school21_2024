@@ -8,15 +8,15 @@ import axios from 'axios';
 
 const isDropdownOpen = ref(false);
 const isModalOpen = ref(false);
-const eventType = ref('t1'); // Set default as t1
+const eventType = ref('t1'); 
 const eventName = ref('');
-const eventLocation = ref(''); // Holds the selected location
-const venues = ref([]); // Stores the list of venues fetched from the API
+const eventLocation = ref(''); 
+const venues = ref([]); 
 const startTime = ref('');
 const endTime = ref('');
 const minAttendees = ref('');
-const invitedAttendeesInput = ref(''); // Now it's a string input
-const invitedAttendees = ref([]); // Will hold the array of emails
+const invitedAttendeesInput = ref(''); 
+const invitedAttendees = ref([]); 
 const roundtableId = ref('1'); // For t2 combobox
 const preferences = ref([]); // For t3 and t4 preferences
 const selectedPreferences = ref([]);
@@ -80,11 +80,10 @@ const handleSubmit = async () => {
     toggleModal();
 };
 
-// Fetch venues from the API
 const fetchVenues = async () => {
     try {
         let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_all_venues_strings');
-        venues.value = response.data; // Assuming the response is an array of venue names
+        venues.value = response.data; 
     } catch (error) {
         console.error('Error fetching venues:', error);
     }
@@ -110,7 +109,7 @@ const fetchPreferences = async () => {
 
 onMounted(() => {
     document.addEventListener('click', handleClickOutside);
-    fetchVenues(); // Fetch venues when component is mounted
+    fetchVenues(); 
     fetchPreferences();
 });
 
