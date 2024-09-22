@@ -1,5 +1,6 @@
 <script setup>
     import MyHeader from '@src/components/Header.vue'
+    import MyBasement from '@src/components/Basement.vue'
 </script>
 
 <script>
@@ -61,16 +62,17 @@ methods:{
     {
         this.day = this.getDayOfWeek(this.shift +6);
         this.next = this.getDayOfWeek(this.shift);
-        this.date = this.getDay(this.shift - 1);
-        this.nextDate = this.getDay(this.shift);
+        this.date = this.getDay(this.shift);
+        this.nextDate = this.getDay(this.shift + 1);
         let data;
-        let events = []
-        localStorage.setItem('user', JSON.stringify({userId: "66ed6be90840463b66a487fa", email: "hello13224@yandex.ru", password: "some_password" }));
-        let user = localStorage.getItem('user');
+        let events = [];
         try {
+            let userid = localStorage.getItem('user');
+            let userObj = {}
+            userObj.userId = userid
             const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user', {
-                params:{
-                    userJsonId: user},})    
+                params: {
+                    userJsonId: JSON.stringify(userObj)},}) 
                     data = JSON.parse(response.data)
                     console.log(data)
                     for(let i = 0; i < data.User.Events.length; i++)
@@ -136,80 +138,99 @@ methods:{
 </script>
 
 <template>
-    <MyHeader/>
+    <MyHeader />
     <div class="calendar">
         <div class="date">
-               <p>Сегодня</p>
-                <p>{{ day }} {{ date }}</p>
-                <div class="wrapper">
-                <ul class="table" v-for="(id, index) in todayTime">
-                    {{ id }}
+            <div class="header">
+                <p class="title">Сегодня</p>
+                <p class="subtitle">{{ day }} {{ date }}</p>
+            </div>
+            <div class="wrapper">
+                <ul class="event-list">
+                    <li v-for="(event, index) in todayTime" :key="index" class="event-item">
+                        {{ event }}
+                    </li>
                 </ul>
-                </div>
+            </div>
         </div>
+
         <div class="date">
-               <p>завтра</p>
-                <p>{{ next }} {{ nextDate }}</p>
-                <div class="wrapper">
-                <ul class="table" v-for="(id, index) in tomorrowTime">
-                    {{ id }}
+            <div class="header">
+                <p class="title">Завтра</p>
+                <p class="subtitle">{{ next }} {{ nextDate }}</p>
+            </div>
+            <div class="wrapper">
+                <ul class="event-list">
+                    <li v-for="(event, index) in tomorrowTime" :key="index" class="event-item">
+                        {{ event }}
+                    </li>
                 </ul>
-                </div>
+            </div>
         </div>
     </div>
+    <MyBasement />
 </template>
 
+
 <style scoped>
-
-    .calendar
-    {
+    .calendar {
         display: flex;
-        position: relative;
         flex-direction: column;
-        justify-content: center;
-        margin-top: 7%;
         align-items: center;
-        top: 0px;
+        justify-content: center;
+        margin-top: 4rem;
+        width: 100%;
+    }
+
+    .date {
         width: 80%;
-        left: 10%;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        padding: 1.5rem;
     }
-    
-    .date
-    {
-        padding-top: 1%;
-        padding-bottom: 1%;
-        min-width: 45%;
-        width: auto ;
-        min-height: 150px;
-        display: inline-block;
-        background-color: #68148f;
-        color: #fff;
-        border-radius: 10%;
-        margin-top: 2%;
+
+    .header {
         text-align: center;
-        justify-self: center;
+        margin-bottom: 1.5rem;
     }
 
-    .table
-    {
-        display: flex;
-        flex-direction: column;
-        min-width: max-content ;
-        margin-top: 3%;
-        align-items: flex-start;
-        flex-wrap: wrap;
-        background-color: #68148f;
-    }
-    
-    .wrapper
-    {
-        max-width: 90%;
-        display: inline-block;
-        align-items: center;
-        justify-content: center;
-        margin-left: 10%;
-        margin-right: 10%;
-
+    .title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #3d155f;
     }
 
+    .subtitle {
+        font-size: 1.2rem;
+        color: #8e44ad;
+    }
+
+    .wrapper {
+        max-width: 100%;
+        margin: 0 auto;
+        text-align: left;
+    }
+
+    .event-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .event-item {
+        font-size: 1rem;
+        color: #4b0082;
+        padding: 0.8rem;
+        background-color: #f0e6fa;
+        border-left: 4px solid #8e44ad;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+    .event-item:hover {
+        background-color: #e0d4f5;
+    }
 </style>
