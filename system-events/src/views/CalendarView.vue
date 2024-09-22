@@ -65,12 +65,14 @@ methods:{
         this.nextDate = this.getDay(this.shift + 1);
         let data;
         let events = []
-        localStorage.setItem('user', JSON.stringify({userId: "66ed6be90840463b66a487fa", email: "hello13224@yandex.ru", password: "some_password" }));
-        let user = localStorage.getItem('user');
         try {
+            
+            let userid = localStorage.getItem('user');
+            let userObj = {}
+            userObj.userId = userid
             const response = await axios.get(import.meta.env.VITE_NODE_API_HOST + '/api/get_user', {
                 params:{
-                    userJsonId: user},})    
+                    userJsonId: JSON.stringify(userObj)},})    
                     data = JSON.parse(response.data)
                     console.log(data)
                     for(let i = 0; i < data.User.Events.length; i++)
