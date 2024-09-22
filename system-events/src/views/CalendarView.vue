@@ -106,7 +106,7 @@ methods:{
             }
             else if (day + month == this.nextDate)
             {
-                this.tomorrowTime[this.todayTime.length] = hour + ':' + minute + ' - ' + end_hour + ':' + end_minute
+                this.tomorrowTime[this.todayTime.length] = hour + ':' + minute + ' - ' + end_hour + ':' + end_minute + '\" ' + data.data.Name + '\" ' + ' площадка:\n' + data.data.Venue
             }
             }
             if(this.todayTime.length == 0)
