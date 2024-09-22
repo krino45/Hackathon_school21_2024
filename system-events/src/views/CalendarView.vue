@@ -59,10 +59,10 @@ methods:{
     },
     async fetch()
     {
-        this.day = this.getDayOfWeek(this.shift +6);
-        this.next = this.getDayOfWeek(this.shift);
-        this.date = this.getDay(this.shift - 1);
-        this.nextDate = this.getDay(this.shift);
+        this.day = this.getDayOfWeek(this.shift);
+        this.next = this.getDayOfWeek(this.shift + 1);
+        this.date = this.getDay(this.shift);
+        this.nextDate = this.getDay(this.shift + 1);
         let data;
         let events = []
         localStorage.setItem('user', JSON.stringify({userId: "66ed6be90840463b66a487fa", email: "hello13224@yandex.ru", password: "some_password" }));
@@ -176,15 +176,15 @@ methods:{
     
     .date
     {
+        box-sizing: border-box;
         padding-top: 1%;
         padding-bottom: 1%;
-        min-width: 45%;
-        width: auto ;
+        min-width: 50%;
         min-height: 150px;
         display: inline-block;
         background-color: #68148f;
         color: #fff;
-        border-radius: 10%;
+        border-radius: 30px;
         margin-top: 2%;
         text-align: center;
         justify-self: center;
@@ -194,7 +194,6 @@ methods:{
     {
         display: flex;
         flex-direction: column;
-        min-width: max-content ;
         margin-top: 3%;
         align-items: flex-start;
         flex-wrap: wrap;
@@ -203,13 +202,10 @@ methods:{
     
     .wrapper
     {
-        max-width: 90%;
-        display: inline-block;
+        display: flex;
+        flex-wrap: wrap;
         align-items: center;
-        justify-content: center;
-        margin-left: 10%;
-        margin-right: 10%;
-
+        justify-content: space-evenly;
     }
 
 </style>
