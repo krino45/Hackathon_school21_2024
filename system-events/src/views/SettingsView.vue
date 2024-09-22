@@ -7,7 +7,7 @@ import HeaderCustom from '@src/components/Header.vue';
 const checkUserId = async () => {
     const storedUserId = localStorage.getItem('user');
     if (storedUserId && typeof storedUserId === 'string') {
-        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user", {
+        let response = await axios.get(import.meta.env.VITE_NODE_API_HOST + "/api/get_user/safe", {
             params: { userJsonId: JSON.stringify({ userId: storedUserId }) },
         });
         console.log(response.data);

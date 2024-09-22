@@ -116,6 +116,38 @@ namespace MyApi
             }
         }
 
+        public async Task<string> GetUserByIdAsyncJSON_safe(string json)
+        {
+            try
+            {
+                var jsonObj = JObject.Parse(json);
+                var id = jsonObj["userId"]?.ToString();
+
+                if (string.IsNullOrEmpty(id))
+                {
+                    return JsonConvert.SerializeObject(new { Success = false, Message = "User ID is required." });
+                }
+
+                var user = await _user_repo.GetUserByIdAsync(new ObjectId(id));
+
+                if (user == null)
+                {
+                    return JsonConvert.SerializeObject(new { Success = false, Message = "User not found." });
+                }
+
+                return JsonConvert.SerializeObject(new { Success = true, Message = "User found!" });
+            }
+            catch (JsonException ex)
+            {
+                return JsonConvert.SerializeObject(new { Success = false, Message = "Invalid JSON format.", Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new { Success = false, Message = "An error occurred.", Error = ex.Message });
+            }
+        }
+
+
         public async Task<string?> GetUserByEmailAsyncJSON(string json)
         {
             try
